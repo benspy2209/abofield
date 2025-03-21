@@ -37,10 +37,12 @@ const Contact = () => {
     <section id="contact" className="section-padding bg-white">
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="section-subtitle">Contact</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2">
-            Contactez-nous
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle">Contact</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 mt-1">
+              Contactez-nous
+            </h2>
+          </div>
           <p className="text-gray-600 mt-4">
             Nous sommes à votre disposition pour répondre à vos questions et vous conseiller sur vos projets.
           </p>
