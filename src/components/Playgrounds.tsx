@@ -100,27 +100,11 @@ const Playgrounds = () => {
           </div>
           
           <div className="order-1 lg:order-2 space-y-4 fade-in-view">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg overflow-hidden shadow-md">
-                <img 
-                  src="https://images.unsplash.com/photo-1597466599360-3b9775841aec?q=80&w=600&auto=format&fit=crop" 
-                  alt="Aire de jeux colorée" 
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-              <div className="rounded-lg overflow-hidden shadow-md">
-                <img 
-                  src="https://images.unsplash.com/photo-1574281570877-bd815ebb50a4?q=80&w=600&auto=format&fit=crop" 
-                  alt="Enfants jouant sur une aire de jeux" 
-                  className="w-full h-64 object-cover"
-                />
-              </div>
-            </div>
             <div className="rounded-lg overflow-hidden shadow-md">
               <img 
-                src="https://images.unsplash.com/photo-1600195077077-7c815f540a3d?q=80&w=800&auto=format&fit=crop" 
-                alt="Vue d'ensemble d'une aire de jeux" 
-                className="w-full h-64 object-cover"
+                src="/jeux.jpg" 
+                alt="Aire de jeux colorée" 
+                className="w-full h-auto object-cover"
               />
             </div>
           </div>
