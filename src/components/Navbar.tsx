@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Download, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { Link } from 'react-scroll';
+import DownloadBrochureForm from './DownloadBrochureForm';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -118,15 +119,12 @@ const Navbar = () => {
             Contact
           </Link>
           
-          <a 
-            href="/brochure.pdf" 
-            target="_blank" 
-            rel="noopener noreferrer"
+          <DownloadBrochureForm 
+            buttonText="Brochure"
+            pdfUrl="/brochure.pdf"
             className="flex items-center space-x-2 btn-primary"
-          >
-            <Download className="w-4 h-4" />
-            <span>Brochure</span>
-          </a>
+            showIcon={true}
+          />
         </div>
 
         {/* Mobile menu button */}
@@ -226,16 +224,12 @@ const Navbar = () => {
               Contact
             </Link>
             
-            <a 
-              href="/brochure.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <DownloadBrochureForm 
+              buttonText="Brochure"
+              pdfUrl="/brochure.pdf"
               className="flex items-center space-x-2 btn-primary w-full justify-center"
-              onClick={closeMenu}
-            >
-              <Download className="w-4 h-4" />
-              <span>Brochure</span>
-            </a>
+              showIcon={true}
+            />
           </div>
         </div>
       )}

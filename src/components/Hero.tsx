@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { ArrowDown, Download } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import { Link } from 'react-scroll';
+import DownloadBrochureForm from './DownloadBrochureForm';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -49,15 +50,11 @@ const Hero = () => {
               Découvrir nos services
             </Link>
             
-            <a 
-              href="/brochure.pdf" 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <DownloadBrochureForm 
+              buttonText="Télécharger la brochure"
+              pdfUrl="/brochure.pdf"
               className="flex items-center justify-center space-x-2 bg-white text-abofield-blue px-6 py-3 rounded-md shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium"
-            >
-              <Download className="w-4 h-4" />
-              <span>Télécharger la brochure</span>
-            </a>
+            />
           </div>
         </div>
         
