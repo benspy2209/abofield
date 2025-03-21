@@ -173,7 +173,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start">
                 <span className="text-white/80">Adresse:</span>
-                <span className="ml-2 text-white/80">123 Avenue des Revêtements, 1000 Bruxelles, Belgique</span>
+                <span className="ml-2 text-white/80">Rue P. Van Obberghen 45, 1140 Evere, Belgique</span>
               </li>
               <li className="flex items-start">
                 <span className="text-white/80">Contact:</span>

@@ -122,8 +122,8 @@ const Contact = () => {
                   details={
                     <div>
                       <p>ABOFIELD srl/ BV</p>
-                      <p>123 Avenue des Revêtements</p>
-                      <p>1000 Bruxelles, Belgique</p>
+                      <p>Rue P. Van Obberghen 45</p>
+                      <p>1140 Evere, Belgique</p>
                     </div>
                   }
                 />
