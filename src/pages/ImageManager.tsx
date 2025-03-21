@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Upload, ExternalLink, Trash2, Plus, Edit, RefreshCw, Check, X } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink, Trash2, Plus, Edit, RefreshCw, Check, X, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -9,9 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSupabaseImages } from "@/hooks/useSupabaseImages";
 import { ImageItem } from "@/types/image";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 const ImageManager = () => {
   const { toast } = useToast();
@@ -25,6 +25,8 @@ const ImageManager = () => {
     updateUsage,
     refreshImages
   } = useSupabaseImages();
+  
+  const supabaseConfigured = isSupabaseConfigured();
   
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
@@ -53,7 +55,6 @@ const ImageManager = () => {
       const file = e.target.files[0];
       setNewImage(file);
       
-      // Create a preview URL
       const fileReader = new FileReader();
       fileReader.onload = () => {
         setPreviewUrl(fileReader.result as string);
@@ -73,7 +74,6 @@ const ImageManager = () => {
     );
     
     if (success) {
-      // Reset form
       setNewImage(null);
       setPreviewUrl(null);
       setSelectedImage(null);
@@ -113,7 +113,6 @@ const ImageManager = () => {
     const success = await updateUsage(selectedImage.id, newUsedIn);
     
     if (success && selectedImage) {
-      // Update local state
       setSelectedImage({
         ...selectedImage,
         usedIn: newUsedIn
@@ -145,6 +144,107 @@ const ImageManager = () => {
       setNewImageDescription('');
     }
   };
+
+  if (!supabaseConfigured) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto py-8 px-4">
+          <div className="flex items-center mb-8">
+            <Link to="/" className="flex items-center text-abofield-blue hover:text-abofield-lightblue mr-4">
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Retour au site
+            </Link>
+            <h1 className="text-3xl font-serif font-bold text-abofield-dark-text">Gestionnaire d'images</h1>
+          </div>
+          
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Configuration manquante</AlertTitle>
+            <AlertDescription className="mt-2">
+              <p className="mb-2">Les variables d'environnement Supabase sont manquantes. Veuillez configurer Supabase pour utiliser le gestionnaire d'images.</p>
+              <Link to="/settings">
+                <Button variant="outline" className="mt-2">
+                  Aller à la configuration
+                </Button>
+              </Link>
+            </AlertDescription>
+          </Alert>
+          
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Configuration requise</h2>
+            <p className="mb-4">Pour utiliser le gestionnaire d'images, vous devez configurer les variables d'environnement Supabase :</p>
+            <ul className="list-disc list-inside space-y-2 mb-6">
+              <li>VITE_SUPABASE_URL - L'URL de votre projet Supabase</li>
+              <li>VITE_SUPABASE_ANON_KEY - La clé anonyme de votre projet Supabase</li>
+            </ul>
+            
+            <div className="bg-gray-100 p-4 rounded-lg mb-6">
+              <h3 className="font-medium mb-2">SQL pour la création de la table</h3>
+              <pre className="bg-gray-800 text-white p-4 rounded overflow-x-auto text-sm">
+{`-- Créer la table images
+CREATE TABLE images (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  description TEXT,
+  path TEXT,
+  type TEXT CHECK (type IN ('local', 'external', 'supabase')),
+  bucket_name TEXT,
+  file_path TEXT,
+  used_in TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Activer l'extension uuid-ossp si ce n'est pas déjà fait
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Créer une fonction pour mettre à jour updated_at automatiquement
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Créer un trigger pour mettre à jour updated_at automatiquement
+CREATE TRIGGER update_images_updated_at
+BEFORE UPDATE ON images
+FOR EACH ROW
+EXECUTE FUNCTION update_modified_column();
+
+-- Configurer la politique RLS (Row Level Security)
+ALTER TABLE images ENABLE ROW LEVEL SECURITY;
+
+-- Politique pour permettre l'accès à tous (vous pouvez la restreindre plus tard)
+CREATE POLICY "Allow full access to all users" ON images
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);`}
+              </pre>
+            </div>
+            
+            <div className="bg-gray-100 p-4 rounded-lg mb-6">
+              <h3 className="font-medium mb-2">Configuration du bucket de stockage</h3>
+              <p className="mb-2">Dans l'interface Supabase, créez un bucket de stockage nommé "images" avec les paramètres suivants :</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Nom du bucket : images</li>
+                <li>Accès public : Activé</li>
+                <li>Politique de téléchargement : Autoriser pour tous les utilisateurs</li>
+                <li>Politique de téléchargement depuis le storage : Autoriser pour tous les utilisateurs</li>
+              </ul>
+            </div>
+            
+            <Link to="/settings">
+              <Button className="bg-abofield-blue hover:bg-abofield-blue/90">
+                Configurer Supabase
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
