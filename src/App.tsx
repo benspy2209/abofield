@@ -7,6 +7,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import ImageManager from "./pages/ImageManager";
+import AdminDashboard from "./pages/AdminDashboard";
+import ContentEditor from "./pages/ContentEditor";
+import SiteSettings from "./pages/SiteSettings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -28,6 +31,30 @@ const App = () => (
               element={
                 <ProtectedRoute requireAdmin={true}>
                   <ImageManager />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/content-editor"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <ContentEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/site-settings"
+              element={
+                <ProtectedRoute requireAdmin={true}>
+                  <SiteSettings />
                 </ProtectedRoute>
               }
             />

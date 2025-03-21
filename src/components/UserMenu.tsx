@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Images, Settings, Lock } from 'lucide-react';
+import { User, LogOut, Images, Settings, Lock, LayoutDashboard, FileText, PencilRuler } from 'lucide-react';
 
 const UserMenu = () => {
   const { user, profile, isAdmin, signOut } = useAuth();
@@ -37,20 +37,45 @@ const UserMenu = () => {
           <span className="hidden md:inline">
             {profile?.full_name || user.email?.split('@')[0]}
           </span>
+          {isAdmin && <span className="ml-1 text-xs bg-green-500 text-white px-1.5 py-0.5 rounded-full">Admin</span>}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="w-64">
+        <DropdownMenuLabel>
+          {isAdmin ? 'Administration' : 'Mon compte'}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
         {isAdmin && (
           <Fragment>
+            <DropdownMenuItem asChild>
+              <Link to="/admin-dashboard" className="flex items-center cursor-pointer">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Tableau de bord</span>
+              </Link>
+            </DropdownMenuItem>
+            
             <DropdownMenuItem asChild>
               <Link to="/image-manager" className="flex items-center cursor-pointer">
                 <Images className="mr-2 h-4 w-4" />
                 <span>Gestionnaire d'images</span>
               </Link>
             </DropdownMenuItem>
+            
+            <DropdownMenuItem asChild>
+              <Link to="/content-editor" className="flex items-center cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" />
+                <span>Éditeur de contenu</span>
+              </Link>
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem asChild>
+              <Link to="/site-settings" className="flex items-center cursor-pointer">
+                <PencilRuler className="mr-2 h-4 w-4" />
+                <span>Paramètres du site</span>
+              </Link>
+            </DropdownMenuItem>
+            
             <DropdownMenuSeparator />
           </Fragment>
         )}
