@@ -14,11 +14,14 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// Create a query client with specific configuration for better error handling
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      staleTime: 10000, // Consider data fresh for 10 seconds
     },
   },
 });

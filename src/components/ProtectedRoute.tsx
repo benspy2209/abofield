@@ -33,6 +33,13 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     }
   }, [location, toast]);
 
+  // Log protected route status for debugging
+  console.log("ProtectedRoute - Path:", location.pathname);
+  console.log("ProtectedRoute - User:", !!user);
+  console.log("ProtectedRoute - IsAdmin:", isAdmin);
+  console.log("ProtectedRoute - RequireAdmin:", requireAdmin);
+  console.log("ProtectedRoute - IsLoading:", isLoading);
+
   // Pendant le chargement, on affiche un indicateur de chargement
   if (isLoading) {
     return (

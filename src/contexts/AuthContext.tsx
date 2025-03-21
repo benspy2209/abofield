@@ -79,72 +79,92 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchUserProfile = async (userId: string) => {
     console.log('Fetching user profile for:', userId);
     
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (error) {
-      console.error('Error fetching user profile:', error);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        setProfile(null);
+        setIsAdmin(false);
+        return;
+      }
+      
+      console.log('Profile data retrieved:', data);
+      setProfile(data as ProfileType);
+      
+      // Ensure admin status is correctly set
+      const adminStatus = data?.is_admin === true;
+      console.log('Setting isAdmin to:', adminStatus);
+      setIsAdmin(adminStatus);
+    } catch (error) {
+      console.error('Exception in fetchUserProfile:', error);
       setProfile(null);
       setIsAdmin(false);
-      return;
     }
-    
-    console.log('Profile data:', data);
-    setProfile(data as ProfileType);
-    
-    // Assurez-vous que le statut d'admin est correctement défini
-    const adminStatus = !!data?.is_admin;
-    console.log('Setting isAdmin to:', adminStatus);
-    setIsAdmin(adminStatus);
   };
   
   const signIn = async (email: string, password: string) => {
     console.log('Signing in with:', email);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (error) {
+      console.error('Error in signIn function:', error);
+      return { error };
+    }
   };
   
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
         },
-      },
-    });
-    return { error };
+      });
+      return { error };
+    } catch (error) {
+      console.error('Error in signUp function:', error);
+      return { error: error };
+    }
   };
   
   const signOut = async () => {
     console.log('Signing out...');
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
-        throw error;
-      }
-      
-      // Force clear local state to ensure UI updates
+      // First clear the local state
       setUser(null);
       setSession(null);
       setProfile(null);
       setIsAdmin(false);
       
+      // Then sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out from Supabase:', error);
+        throw error;
+      }
+      
       console.log('Sign out successful, state cleared');
       
-      // Force refresh du localStorage pour assurer que la session est bien nettoyée
+      // Force clear all auth-related local storage
       localStorage.removeItem('sb-piufckgtnbcrwvlavqll-auth-token');
       
       // Petite pause pour laisser le temps à Supabase de finaliser la déconnexion
       await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Force a reload to ensure a clean state
+      window.location.reload();
     } catch (error) {
       console.error('Error in signOut function:', error);
       throw error;

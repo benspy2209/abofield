@@ -19,7 +19,10 @@ const UserMenu = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSignOut = async () => {
+  const handleSignOut = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     try {
       console.log("Déconnexion initiée...");
       await signOut();
@@ -27,10 +30,6 @@ const UserMenu = () => {
         title: "Déconnexion réussie",
         description: "Vous avez été déconnecté avec succès",
       });
-      console.log("Redirection vers la page d'accueil...");
-      navigate('/');
-      // Force un rechargement de la page pour s'assurer que tout est réinitialisé
-      window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
@@ -77,29 +76,29 @@ const UserMenu = () => {
         
         {isAdmin && (
           <Fragment>
-            <DropdownMenuItem className="w-full" asChild>
-              <Link to="/admin-dashboard" className="flex items-center cursor-pointer w-full">
+            <DropdownMenuItem className="w-full cursor-pointer" asChild>
+              <Link to="/admin-dashboard" className="flex items-center w-full">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span>Tableau de bord</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem className="w-full" asChild>
-              <Link to="/image-manager" className="flex items-center cursor-pointer w-full">
+            <DropdownMenuItem className="w-full cursor-pointer" asChild>
+              <Link to="/image-manager" className="flex items-center w-full">
                 <Images className="mr-2 h-4 w-4" />
                 <span>Gestionnaire d'images</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem className="w-full" asChild>
-              <Link to="/content-editor" className="flex items-center cursor-pointer w-full">
+            <DropdownMenuItem className="w-full cursor-pointer" asChild>
+              <Link to="/content-editor" className="flex items-center w-full">
                 <FileText className="mr-2 h-4 w-4" />
                 <span>Éditeur de contenu</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem className="w-full" asChild>
-              <Link to="/site-settings" className="flex items-center cursor-pointer w-full">
+            <DropdownMenuItem className="w-full cursor-pointer" asChild>
+              <Link to="/site-settings" className="flex items-center w-full">
                 <PencilRuler className="mr-2 h-4 w-4" />
                 <span>Paramètres du site</span>
               </Link>
@@ -109,10 +108,10 @@ const UserMenu = () => {
           </Fragment>
         )}
         
-        <DropdownMenuItem className="w-full">
+        <DropdownMenuItem className="w-full cursor-pointer text-destructive">
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center cursor-pointer text-destructive"
+            className="flex w-full items-center"
           >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Déconnexion</span>
