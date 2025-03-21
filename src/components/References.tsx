@@ -26,7 +26,7 @@ const projects: Project[] = [
     location: "Bruxelles",
     category: "playground",
     description: "Rénovation complète de l'aire de jeux avec installation d'un revêtement amortissant coloré et thématique.",
-    image: "https://images.unsplash.com/photo-1519331582073-283f1a211a3e?q=80&w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1597466599360-3b9775841aec?q=80&w=800&auto=format&fit=crop",
     testimonial: {
       name: "Marie Dubois",
       role: "Directrice des espaces verts",
@@ -39,7 +39,7 @@ const projects: Project[] = [
     location: "Liège",
     category: "sports",
     description: "Installation d'un gazon synthétique de dernière génération avec sous-couche amortissante ET layer.",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=800&auto=format&fit=crop",
     testimonial: {
       name: "Thomas Leroy",
       role: "Président du club",
@@ -52,7 +52,7 @@ const projects: Project[] = [
     location: "Namur",
     category: "playground",
     description: "Création d'une aire de jeux éducative avec différentes zones thématiques et revêtements adaptés.",
-    image: "https://images.unsplash.com/photo-1566140967404-b8b3932483f5?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1553003905-f604a3a45da0?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: 4,
@@ -60,7 +60,7 @@ const projects: Project[] = [
     location: "Charleroi",
     category: "sports",
     description: "Aménagement d'un espace multisport avec revêtement polyvalent pour différentes pratiques sportives.",
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1468259275264-bbe089c59d1a?q=80&w=800&auto=format&fit=crop",
     testimonial: {
       name: "Philippe Martin",
       role: "Directeur du centre sportif",
@@ -73,7 +73,7 @@ const projects: Project[] = [
     location: "Anvers",
     category: "sports",
     description: "Rénovation de la piste d'athlétisme et installation d'un revêtement haute performance.",
-    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1595231712325-c9626d50b606?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: 6,
@@ -81,7 +81,7 @@ const projects: Project[] = [
     location: "Gand",
     category: "playground",
     description: "Installation de sols amortissants personnalisés pour différentes zones thématiques du parc.",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1578894902470-7f78921590e9?q=80&w=800&auto=format&fit=crop"
   }
 ];
 

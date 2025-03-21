@@ -61,21 +61,21 @@ const Services = () => {
           <ServiceCard 
             title="Pleines de jeux" 
             description="Revêtements sécurisés pour aires de jeux, zones de gymnastique et espaces de fitness extérieurs et intérieurs."
-            image="https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?q=80&w=600&auto=format&fit=crop"
+            image="https://images.unsplash.com/photo-1597466599360-3b9775841aec?q=80&w=600&auto=format&fit=crop"
             linkTo="playgrounds"
           />
           
           <ServiceCard 
             title="Terrains de sports" 
             description="Surfaces adaptées pour terrains de football, courts de tennis, espaces multisports et pistes d'athlétisme."
-            image="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=600&auto=format&fit=crop"
+            image="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=600&auto=format&fit=crop"
             linkTo="sports"
           />
           
           <ServiceCard 
             title="Entretien" 
             description="Contrôles réguliers, entretien préventif et réparations pour maintenir la qualité et la sécurité de vos revêtements."
-            image="https://images.unsplash.com/photo-1599619585752-c3edb42a414c?q=80&w=600&auto=format&fit=crop"
+            image="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=600&auto=format&fit=crop"
             linkTo="maintenance"
           />
         </div>

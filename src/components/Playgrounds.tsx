@@ -103,14 +103,14 @@ const Playgrounds = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg overflow-hidden shadow-md">
                 <img 
-                  src="https://images.unsplash.com/photo-1568712795966-50e59650ce39?q=80&w=600&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1597466599360-3b9775841aec?q=80&w=600&auto=format&fit=crop" 
                   alt="Aire de jeux colorée" 
                   className="w-full h-64 object-cover"
                 />
               </div>
               <div className="rounded-lg overflow-hidden shadow-md">
                 <img 
-                  src="https://images.unsplash.com/photo-1519331582073-283f1a211a3e?q=80&w=600&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1553003905-f604a3a45da0?q=80&w=600&auto=format&fit=crop" 
                   alt="Enfants jouant sur une aire de jeux" 
                   className="w-full h-64 object-cover"
                 />
@@ -118,7 +118,7 @@ const Playgrounds = () => {
             </div>
             <div className="rounded-lg overflow-hidden shadow-md">
               <img 
-                src="https://images.unsplash.com/photo-1581622558634-0492d1e3d92e?q=80&w=800&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1578894902470-7f78921590e9?q=80&w=800&auto=format&fit=crop" 
                 alt="Vue d'ensemble d'une aire de jeux" 
                 className="w-full h-64 object-cover"
               />

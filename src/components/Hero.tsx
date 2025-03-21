@@ -21,7 +21,7 @@ const Hero = () => {
       <div className="absolute inset-0 z-0">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607461184224-8c7da2cfc383?q=80&w=1920&auto=format&fit=crop')" }}
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1620366392312-a882ba99461c?q=80&w=1920&auto=format&fit=crop')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-r from-abofield-blue/80 to-abofield-green/70"></div>
       </div>

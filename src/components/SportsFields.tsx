@@ -23,7 +23,7 @@ const sportsCategories: SportCategory[] = [
       "Absorption des chocs optimale",
       "Maintenance facile"
     ],
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1468259275264-bbe089c59d1a?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: "synthetic",
@@ -35,7 +35,7 @@ const sportsCategories: SportCategory[] = [
       "Drainage efficace",
       "Faible besoin en entretien"
     ],
-    image: "https://images.unsplash.com/photo-1555403884-a55261b15001?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: "track",
@@ -47,7 +47,7 @@ const sportsCategories: SportCategory[] = [
       "Propriétés antidérapantes",
       "Conforme aux normes IAAF"
     ],
-    image: "https://images.unsplash.com/photo-1557803056-a45cda8b323b?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1595231712325-c9626d50b606?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: "etlayer",
@@ -59,7 +59,7 @@ const sportsCategories: SportCategory[] = [
       "Installation sur diverses surfaces",
       "Performances constantes"
     ],
-    image: "https://images.unsplash.com/photo-1615731449720-7598ec95fe91?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?q=80&w=800&auto=format&fit=crop"
   }
 ];
 

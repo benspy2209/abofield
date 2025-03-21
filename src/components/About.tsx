@@ -69,7 +69,7 @@ const About = () => {
           <div className="relative">
             <div className="rounded-2xl overflow-hidden shadow-xl fade-in-view">
               <img 
-                src="https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?q=80&w=800&auto=format&fit=crop" 
+                src="https://images.unsplash.com/photo-1495556650867-99590cea3657?q=80&w=800&auto=format&fit=crop" 
                 alt="ABOFIELD installation terrain" 
                 className="w-full h-full object-cover object-center"
               />
