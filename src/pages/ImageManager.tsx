@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload, ExternalLink, Trash2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink, Trash2, RefreshCw, ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -19,7 +19,8 @@ import {
   checkAndCreateImagesBucket,
   addNewImage,
   updateImage,
-  deleteImage
+  deleteImage,
+  initializeDefaultImages
 } from "@/utils/imageUtils";
 
 const ImageManager = () => {
@@ -40,6 +41,7 @@ const ImageManager = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bucketExists, setBucketExists] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
     initializeImageManager();
@@ -83,28 +85,16 @@ const ImageManager = () => {
       const imagesData = await fetchAllImages();
       
       if (imagesData.length === 0) {
-        console.log('Aucune image trouvée ou erreur');
-        // Utiliser des données d'exemple
-        setImages([
-          {
-            id: '1',
-            name: 'Image exemple 1',
-            path: '/placeholder.svg',
-            type: 'local',
-            description: 'Image fictive pour le développement'
-          },
-          {
-            id: '2',
-            name: 'Image exemple 2',
-            path: 'https://via.placeholder.com/150',
-            type: 'external',
-            description: 'Image externe fictive pour le développement'
-          }
-        ]);
+        console.log('Aucune image trouvée, tentative d\'initialisation avec les images par défaut...');
+        // Afficher message temporaire
         toast({
-          title: "Mode développement",
-          description: "Aucune image trouvée. Des images fictives sont affichées pour le développement.",
+          title: "Initialisation",
+          description: "Aucune image trouvée. Initialisation des images par défaut...",
         });
+        await initializeImages();
+        // Récupérer à nouveau après initialisation
+        const updatedImagesData = await fetchAllImages();
+        setImages(updatedImagesData);
       } else {
         console.log('Images récupérées:', imagesData);
         setImages(imagesData);
@@ -137,6 +127,26 @@ const ImageManager = () => {
     }
   };
 
+  const initializeImages = async () => {
+    setIsInitializing(true);
+    try {
+      await initializeDefaultImages();
+      toast({
+        title: "Succès",
+        description: "Les images par défaut ont été initialisées avec succès",
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation des images:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'initialiser les images par défaut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     await fetchImages();
@@ -145,6 +155,29 @@ const ImageManager = () => {
       title: "Rafraîchi",
       description: "Les images ont été rafraîchies",
     });
+  };
+
+  const handleInitializeImages = async () => {
+    if (isInitializing) return;
+    
+    setIsInitializing(true);
+    try {
+      await initializeDefaultImages();
+      await fetchImages();
+      toast({
+        title: "Succès",
+        description: "Images par défaut réinitialisées avec succès",
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation des images:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser les images par défaut",
+        variant: "destructive",
+      });
+    } finally {
+      setIsInitializing(false);
+    }
   };
 
   const filteredImages = images.filter(image => {
@@ -269,7 +302,7 @@ const ImageManager = () => {
       setDeleteDialogOpen(false);
       setSelectedImage(null);
     } catch (error: any) {
-      console.error('Erreur lors de la suppression de l\'image:', error.message);
+      console.error('Erreur lors de la suppression de l\'image:', error);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer l'image. Veuillez réessayer.",
@@ -310,6 +343,15 @@ const ImageManager = () => {
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} /> 
               Rafraîchir
+            </Button>
+            <Button 
+              onClick={handleInitializeImages}
+              variant="outline"
+              disabled={isInitializing}
+              className="mr-2"
+            >
+              <ImageIcon className={`w-4 h-4 mr-2`} /> 
+              {isInitializing ? "Initialisation..." : "Réinitialiser les images par défaut"}
             </Button>
             <Button 
               onClick={() => setNewImageDialogOpen(true)}
