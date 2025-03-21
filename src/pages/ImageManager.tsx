@@ -45,15 +45,18 @@ const ImageManager = () => {
   const fetchImages = async () => {
     setIsLoading(true);
     try {
+      console.log('Fetching images from Supabase...');
       const { data, error } = await supabase
         .from('images')
         .select('*')
         .order('created_at', { ascending: false });
       
       if (error) {
+        console.error('Supabase error:', error);
         throw error;
       }
       
+      console.log('Images fetched:', data);
       setImages(data as ImageItem[] || []);
     } catch (error: any) {
       console.error('Error fetching images:', error.message);
@@ -108,6 +111,7 @@ const ImageManager = () => {
             .upload(fileName, newImage);
           
           if (uploadError) {
+            console.error('Upload error:', uploadError);
             throw uploadError;
           }
           
@@ -124,6 +128,7 @@ const ImageManager = () => {
             .eq('id', selectedImage.id);
           
           if (updateError) {
+            console.error('Update error:', updateError);
             throw updateError;
           }
         }
@@ -156,6 +161,7 @@ const ImageManager = () => {
     
     try {
       if (isExternalUrl) {
+        console.log('Adding external image:', newImageUrl);
         const { error } = await supabase
           .from('images')
           .insert({
@@ -167,17 +173,20 @@ const ImageManager = () => {
           });
         
         if (error) {
+          console.error('Insert error:', error);
           throw error;
         }
       } else if (newImage) {
         const fileExt = newImage.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
         
+        console.log('Uploading file to storage:', fileName);
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(fileName, newImage);
         
         if (uploadError) {
+          console.error('Upload error:', uploadError);
           throw uploadError;
         }
         
@@ -185,6 +194,9 @@ const ImageManager = () => {
           .from('images')
           .getPublicUrl(fileName);
         
+        console.log('File uploaded, public URL:', publicUrl);
+        
+        console.log('Adding image record to database');
         const { error } = await supabase
           .from('images')
           .insert({
@@ -196,6 +208,7 @@ const ImageManager = () => {
           });
         
         if (error) {
+          console.error('Insert error:', error);
           throw error;
         }
       }
@@ -233,6 +246,7 @@ const ImageManager = () => {
       if (selectedImage.type === 'local') {
         const fileName = selectedImage.path.split('/').pop();
         if (fileName) {
+          console.log('Deleting file from storage:', fileName);
           const { error: deleteStorageError } = await supabase.storage
             .from('images')
             .remove([fileName]);
@@ -243,12 +257,14 @@ const ImageManager = () => {
         }
       }
       
+      console.log('Deleting image record from database:', selectedImage.id);
       const { error } = await supabase
         .from('images')
         .delete()
         .eq('id', selectedImage.id);
       
       if (error) {
+        console.error('Delete error:', error);
         throw error;
       }
       
@@ -284,6 +300,48 @@ const ImageManager = () => {
       fileReader.readAsDataURL(file);
     }
   };
+
+  // Vérifier si le bucket d'images existe déjà
+  useEffect(() => {
+    const checkAndCreateBucket = async () => {
+      try {
+        // Vérifier si le bucket existe
+        const { data: buckets, error } = await supabase.storage.listBuckets();
+        
+        console.log('Available buckets:', buckets);
+        
+        const imagesBucketExists = buckets?.some(bucket => bucket.name === 'images');
+        
+        if (!imagesBucketExists) {
+          console.log('Images bucket does not exist, creating it...');
+          
+          // Le bucket n'existe pas, le créer
+          const { error: createError } = await supabase.storage.createBucket('images', {
+            public: true,
+            fileSizeLimit: 10485760, // 10MB
+          });
+          
+          if (createError) {
+            console.error('Error creating bucket:', createError);
+            throw createError;
+          }
+          
+          console.log('Images bucket created successfully');
+        } else {
+          console.log('Images bucket already exists');
+        }
+      } catch (error) {
+        console.error('Error checking/creating bucket:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de configurer le stockage d'images. Veuillez contacter l'administrateur.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    checkAndCreateBucket();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-24">
@@ -341,9 +399,13 @@ const ImageManager = () => {
                             />
                           ) : (
                             <img 
-                              src={image.path} 
+                              src={supabase.storage.from('images').getPublicUrl(image.path.replace('/', '')).data.publicUrl}
                               alt={image.name} 
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.error('Image load error:', image.path);
+                                (e.target as HTMLImageElement).src = '/placeholder.svg';
+                              }}
                             />
                           )}
                         </div>
