@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import NavDesktopMenu from './NavDesktopMenu';
 import NavMobileMenu from './NavMobileMenu';
+import UserMenu from '../UserMenu';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,15 +47,21 @@ const Navbar = () => {
         </div>
 
         {/* Desktop Menu */}
-        <NavDesktopMenu />
+        <div className="hidden lg:flex items-center space-x-6">
+          <NavDesktopMenu />
+          <UserMenu />
+        </div>
 
         {/* Mobile menu button */}
-        <button 
-          onClick={toggleMenu} 
-          className="lg:hidden text-abofield-dark-text focus:outline-none"
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="lg:hidden flex items-center space-x-4">
+          <UserMenu />
+          <button 
+            onClick={toggleMenu} 
+            className="text-abofield-dark-text focus:outline-none"
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}

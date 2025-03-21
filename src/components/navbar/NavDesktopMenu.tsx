@@ -5,7 +5,7 @@ import DownloadBrochureForm from '../DownloadBrochureForm';
 
 const NavDesktopMenu = () => {
   return (
-    <div className="hidden lg:flex items-center space-x-8">
+    <div className="flex items-center space-x-8">
       <Link 
         to="about" 
         spy={true} 
