@@ -38,13 +38,10 @@ const Navbar = () => {
             <img 
               src="/logo_abofield.jpeg" 
               alt="Abofield Logo" 
-              className={`transition-all duration-300 ${
-                isScrolled ? 'h-12' : 'h-16'
+              className={`transition-all duration-300 rounded-full shadow-md ${
+                isScrolled ? 'h-12 w-12 object-cover' : 'h-16 w-16 object-cover'
               }`}
             />
-            <span className="ml-3 text-2xl font-serif font-bold text-abofield-blue hidden sm:inline-block">
-              ABOFIELD
-            </span>
           </a>
         </div>
 
