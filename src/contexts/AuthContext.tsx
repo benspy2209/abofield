@@ -1,6 +1,8 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Session, User } from "@supabase/supabase-js";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AuthContextType {
   session: Session | null;
@@ -26,50 +28,62 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<ProfileType | null>(null);
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const initAuth = async () => {
       setIsLoading(true);
       
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (_event, newSession) => {
-          console.log('Auth state changed:', _event, newSession);
+      try {
+        // Récupérer la session initiale
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        console.log('Initial session:', initialSession);
+        
+        if (initialSession) {
+          setSession(initialSession);
+          setUser(initialSession.user);
           
-          setSession(newSession);
-          setUser(newSession?.user ?? null);
-          
-          if (newSession?.user) {
-            await fetchUserProfile(newSession.user.id);
-          } else {
-            setProfile(null);
-            setIsAdmin(false);
+          if (initialSession.user) {
+            await fetchUserProfile(initialSession.user.id);
           }
         }
-      );
-      
-      const { data: { session: initialSession } } = await supabase.auth.getSession();
-      console.log('Initial session:', initialSession);
-      
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      
-      if (initialSession?.user) {
-        await fetchUserProfile(initialSession.user.id);
-      } else {
-        setProfile(null);
+        
+        // Configurer le gestionnaire d'événements d'authentification
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+          async (_event, newSession) => {
+            console.log('Auth state changed:', _event, newSession);
+            
+            setSession(newSession);
+            setUser(newSession?.user ?? null);
+            
+            if (newSession?.user) {
+              await fetchUserProfile(newSession.user.id);
+            } else {
+              setProfile(null);
+              setIsAdmin(false);
+            }
+          }
+        );
+        
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        toast({
+          title: "Erreur d'authentification",
+          description: "Une erreur s'est produite lors de l'initialisation de l'authentification",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
-      
-      setIsLoading(false);
-      
-      return () => {
-        subscription.unsubscribe();
-      };
     };
     
     initAuth();
-  }, []);
+  }, [toast]);
   
   const fetchUserProfile = async (userId: string) => {
     console.log('Fetching user profile for:', userId);
@@ -83,21 +97,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (error) {
         console.error('Error fetching user profile:', error);
-        console.log('Développement: définir isAdmin=true malgré l\'erreur');
+        console.log('Mode développement: définir isAdmin=true malgré l\'erreur');
         setProfile(null);
-        setIsAdmin(true);
+        setIsAdmin(true); // Pour développement, considérer tous les utilisateurs comme admin
         return;
       }
       
       console.log('Profile data retrieved:', data);
       setProfile(data as ProfileType);
       
-      console.log('Développement: définir isAdmin=true');
+      // Pour le développement, considérer tous les utilisateurs comme admin
+      // En production, nous utiliserions: setIsAdmin(data.is_admin === true);
       setIsAdmin(true);
     } catch (error) {
       console.error('Exception in fetchUserProfile:', error);
       setProfile(null);
-      setIsAdmin(true);
+      setIsAdmin(true); // Pour développement
     }
   };
   
@@ -108,9 +123,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         password,
       });
+      
+      if (error) {
+        console.error('Error signing in:', error);
+        toast({
+          title: "Erreur de connexion",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Connecté avec succès",
+          description: "Vous êtes maintenant connecté",
+        });
+      }
+      
       return { error };
     } catch (error) {
       console.error('Error in signIn function:', error);
+      toast({
+        title: "Erreur de connexion",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
       return { error };
     }
   };
@@ -126,9 +161,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           },
         },
       });
+      
+      if (!error) {
+        toast({
+          title: "Inscription réussie",
+          description: "Veuillez vérifier votre email pour confirmer votre compte",
+        });
+      } else {
+        toast({
+          title: "Erreur d'inscription",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      
       return { error };
     } catch (error) {
       console.error('Error in signUp function:', error);
+      toast({
+        title: "Erreur d'inscription",
+        description: "Une erreur inattendue s'est produite",
+        variant: "destructive",
+      });
       return { error: error };
     }
   };
@@ -136,11 +190,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signOut = async () => {
     console.log('Signing out...');
     try {
+      // Nettoyer d'abord l'état local
       setUser(null);
       setSession(null);
       setProfile(null);
       setIsAdmin(false);
       
+      // Puis se déconnecter de Supabase
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out from Supabase:', error);
@@ -149,13 +205,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       console.log('Sign out successful, state cleared');
       
-      localStorage.removeItem('sb-piufckgtnbcrwvlavqll-auth-token');
+      // Nettoyer le local storage pour s'assurer que toutes les données d'authentification sont supprimées
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('sb-') || key.startsWith('supabase-'))) {
+          keysToRemove.push(key);
+        }
+      }
       
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      toast({
+        title: "Déconnexion réussie",
+        description: "Vous avez été déconnecté avec succès",
+      });
+      
+      // Attendre un court instant pour permettre à tout de se terminer
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      window.location.reload();
+      // Recharger la page pour garantir un état propre
+      window.location.href = '/';
     } catch (error) {
       console.error('Error in signOut function:', error);
+      toast({
+        title: "Erreur de déconnexion",
+        description: "Une erreur s'est produite lors de la déconnexion",
+        variant: "destructive",
+      });
       throw error;
     }
   };

@@ -26,21 +26,17 @@ const UserMenu = () => {
     try {
       console.log("Déconnexion initiée...");
       await signOut();
-      toast({
-        title: "Déconnexion réussie",
-        description: "Vous avez été déconnecté avec succès",
-      });
       
-      // Force navigate after logout
+      // Force navigate after logout - signOut already handles page reload
+      // but we'll add this as a fallback
       setTimeout(() => {
         navigate('/');
-        window.location.reload();
-      }, 500);
+      }, 200);
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
         title: "Erreur de déconnexion",
-        description: "Une erreur s'est produite lors de la déconnexion",
+        description: "Une erreur s'est produite lors de la déconnexion. Veuillez réessayer.",
         variant: "destructive",
       });
     }
@@ -50,7 +46,7 @@ const UserMenu = () => {
   if (!user) {
     return (
       <Link to="/auth">
-        <Button variant="outline" size="sm" className="gap-2 bg-white">
+        <Button variant="outline" size="sm" className="gap-2 bg-white hover:bg-gray-100">
           <Lock className="h-4 w-4" />
           <span className="hidden md:inline">Admin</span>
         </Button>
@@ -66,7 +62,7 @@ const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 bg-white">
+        <Button variant="outline" size="sm" className="gap-2 bg-white hover:bg-gray-100">
           <User className="h-4 w-4" />
           <span className="hidden md:inline">
             {profile?.full_name || user.email?.split('@')[0]}
@@ -115,7 +111,7 @@ const UserMenu = () => {
         )}
         
         <DropdownMenuItem 
-          className="cursor-pointer text-destructive"
+          className="cursor-pointer text-destructive focus:bg-destructive/10"
           onSelect={(e) => {
             e.preventDefault();
             handleSignOut(e as unknown as React.MouseEvent);

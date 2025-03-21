@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   console.log("ProtectedRoute - RequireAdmin:", requireAdmin);
   console.log("ProtectedRoute - IsLoading:", isLoading);
 
-  // Pendant le chargement, on affiche un indicateur de chargement
+  // Si nous sommes en train de charger l'authentification
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -80,11 +80,15 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // Pour les besoins de développement, désactivons temporairement la vérification admin
-  // en considérant tous les utilisateurs authentifiés comme admin
-  if (requireAdmin && !isAdmin) {
-    console.log("Mode développement: Permettre l'accès admin à tous les utilisateurs authentifiés");
-    // Pas de redirection, on considère tout utilisateur comme admin
+  // En mode développement, on considère tout utilisateur authentifié comme admin
+  if (requireAdmin) {
+    if (!isAdmin) {
+      console.log("Mode développement: considérer l'utilisateur comme admin");
+      // Pas de redirection, on considère l'utilisateur comme admin en dev
+      // Cependant, cette vérification est gardée pour une utilisation future en production
+    } else {
+      console.log("Utilisateur est admin, accès autorisé");
+    }
   }
 
   console.log("Accès autorisé à la route protégée");
