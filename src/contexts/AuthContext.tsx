@@ -37,12 +37,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Configurer l'écouteur d'événements d'authentification
       const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (_event, session) => {
-          setSession(session);
-          setUser(session?.user ?? null);
+        async (_event, newSession) => {
+          console.log('Auth state changed:', _event, newSession);
           
-          if (session?.user) {
-            await fetchUserProfile(session.user.id);
+          setSession(newSession);
+          setUser(newSession?.user ?? null);
+          
+          if (newSession?.user) {
+            await fetchUserProfile(newSession.user.id);
           } else {
             setProfile(null);
             setIsAdmin(false);
@@ -52,6 +54,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       // Vérifier s'il existe déjà une session
       const { data: { session: initialSession } } = await supabase.auth.getSession();
+      console.log('Initial session:', initialSession);
+      
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
       
@@ -70,6 +74,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
   
   const fetchUserProfile = async (userId: string) => {
+    console.log('Fetching user profile for:', userId);
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -83,8 +89,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     
+    console.log('Profile data:', data);
     setProfile(data as ProfileType);
-    setIsAdmin(data?.is_admin || false);
+    setIsAdmin(!!data?.is_admin);
+    console.log('Is admin set to:', !!data?.is_admin);
   };
   
   const signIn = async (email: string, password: string) => {
@@ -109,7 +117,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.log('Signing out...');
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+    console.log('Sign out successful');
+    
+    // Clear local state explicitly
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+    setIsAdmin(false);
   };
   
   const value = {
