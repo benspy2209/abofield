@@ -3,6 +3,7 @@ import React from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 import { Link as RouterLink } from 'react-router-dom';
 import { ArrowRight, Image } from 'lucide-react';
+import { getImageUrl } from '@/integrations/supabase/client';
 
 const ServiceCard = ({ 
   title, 
@@ -15,13 +16,22 @@ const ServiceCard = ({
   image: string; 
   linkTo: string; 
 }) => {
+  // Utiliser la fonction getImageUrl pour obtenir l'URL correcte
+  const imageUrl = image.startsWith('/') || image.startsWith('http') 
+    ? getImageUrl(image) 
+    : image;
+
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 group">
       <div className="h-56 overflow-hidden">
         <img 
-          src={image} 
+          src={imageUrl} 
           alt={title} 
           className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          onError={(e) => {
+            console.error(`Erreur de chargement d'image: ${imageUrl}`);
+            (e.target as HTMLImageElement).src = '/placeholder.svg';
+          }}
         />
       </div>
       <div className="p-6">

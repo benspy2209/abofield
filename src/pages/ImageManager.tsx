@@ -1,25 +1,26 @@
+
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload, ExternalLink, Trash2 } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink, Trash2, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-
-interface ImageItem {
-  id: string;
-  name: string;
-  path: string;
-  usage_locations?: string[];
-  description?: string;
-  type: 'local' | 'external';
-}
+import { getImageUrl } from "@/integrations/supabase/client";
+import { 
+  ImageItem, 
+  fetchAllImages, 
+  getDisplayImageUrl, 
+  checkAndCreateImagesBucket,
+  addNewImage,
+  updateImage,
+  deleteImage
+} from "@/utils/imageUtils";
 
 const ImageManager = () => {
   const { toast } = useToast();
@@ -38,52 +39,52 @@ const ImageManager = () => {
   const [newImageDescription, setNewImageDescription] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bucketExists, setBucketExists] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    checkAndCreateBucket();
+    initializeImageManager();
   }, []);
 
-  useEffect(() => {
-    if (bucketExists) {
-      fetchImages();
+  const initializeImageManager = async () => {
+    setIsLoading(true);
+    const bucketCreated = await checkAndCreateImagesBucket();
+    setBucketExists(bucketCreated);
+    if (bucketCreated) {
+      await fetchImages();
+    } else {
+      setImages([
+        {
+          id: '1',
+          name: 'Image exemple 1',
+          path: '/placeholder.svg',
+          type: 'local',
+          description: 'Image fictive pour le développement'
+        },
+        {
+          id: '2',
+          name: 'Image exemple 2',
+          path: 'https://via.placeholder.com/150',
+          type: 'external',
+          description: 'Image externe fictive pour le développement'
+        }
+      ]);
+      toast({
+        title: "Mode développement",
+        description: "Fonctionnement en mode développement sans bucket de stockage",
+      });
     }
-  }, [bucketExists]);
+    setIsLoading(false);
+  };
 
   const fetchImages = async () => {
     setIsLoading(true);
     try {
-      console.log('Fetching images from Supabase...');
+      console.log('Récupération des images depuis Supabase...');
+      const imagesData = await fetchAllImages();
       
-      // Vérifiez d'abord si la table images existe, sinon créez-la
-      try {
-        const { data: existingImages, error: tableCheckError } = await supabase
-          .from('images')
-          .select('count')
-          .limit(1);
-        
-        if (tableCheckError) {
-          console.log('La table images n\'existe probablement pas encore:', tableCheckError);
-          // Créer une variable temporaire pour le développement
-          setImages([]);
-          toast({
-            title: "Mode développement",
-            description: "Utilisation d'images fictives pour le développement. Veuillez créer la table 'images' dans Supabase.",
-          });
-          setIsLoading(false);
-          return;
-        }
-      } catch (error) {
-        console.error('Erreur lors de la vérification de la table:', error);
-      }
-      
-      const { data, error } = await supabase
-        .from('images')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Supabase error:', error);
-        // En mode développement, utilisons des données fictives
+      if (imagesData.length === 0) {
+        console.log('Aucune image trouvée ou erreur');
+        // Utiliser des données d'exemple
         setImages([
           {
             id: '1',
@@ -102,15 +103,15 @@ const ImageManager = () => {
         ]);
         toast({
           title: "Mode développement",
-          description: "Utilisation d'images fictives pour le développement",
+          description: "Aucune image trouvée. Des images fictives sont affichées pour le développement.",
         });
       } else {
-        console.log('Images fetched:', data);
-        setImages(data as ImageItem[] || []);
+        console.log('Images récupérées:', imagesData);
+        setImages(imagesData);
       }
     } catch (error: any) {
-      console.error('Error fetching images:', error.message);
-      // En mode développement, utilisons des données fictives
+      console.error('Erreur lors de la récupération des images:', error.message);
+      // Utiliser des données d'exemple
       setImages([
         {
           id: '1',
@@ -134,6 +135,16 @@ const ImageManager = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await fetchImages();
+    setIsRefreshing(false);
+    toast({
+      title: "Rafraîchi",
+      description: "Les images ont été rafraîchies",
+    });
   };
 
   const filteredImages = images.filter(image => {
@@ -167,36 +178,10 @@ const ImageManager = () => {
     
     try {
       if (newImage) {
-        if (selectedImage.type === 'local') {
-          const fileExt = newImage.name.split('.').pop();
-          const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-          const filePath = `/${fileName}`;
-          
-          const { error: uploadError } = await supabase.storage
-            .from('images')
-            .upload(fileName, newImage);
-          
-          if (uploadError) {
-            console.error('Upload error:', uploadError);
-            throw uploadError;
-          }
-          
-          const { data: { publicUrl } } = supabase.storage
-            .from('images')
-            .getPublicUrl(fileName);
-          
-          const { error: updateError } = await supabase
-            .from('images')
-            .update({
-              path: filePath,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', selectedImage.id);
-          
-          if (updateError) {
-            console.error('Update error:', updateError);
-            throw updateError;
-          }
+        const success = await updateImage(selectedImage, newImage);
+        
+        if (!success) {
+          throw new Error("Échec de la mise à jour de l'image");
         }
       }
       
@@ -211,7 +196,7 @@ const ImageManager = () => {
       setPreviewUrl(null);
       setSelectedImage(null);
     } catch (error: any) {
-      console.error('Error updating image:', error.message);
+      console.error('Erreur lors de la mise à jour de l\'image:', error.message);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour l'image. Veuillez réessayer.",
@@ -226,57 +211,16 @@ const ImageManager = () => {
     setIsUploading(true);
     
     try {
-      if (isExternalUrl) {
-        console.log('Adding external image:', newImageUrl);
-        const { error } = await supabase
-          .from('images')
-          .insert({
-            name: newImageName,
-            description: newImageDescription,
-            path: newImageUrl,
-            type: 'external',
-            usage_locations: [],
-          });
-        
-        if (error) {
-          console.error('Insert error:', error);
-          throw error;
-        }
-      } else if (newImage) {
-        const fileExt = newImage.name.split('.').pop();
-        const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-        
-        console.log('Uploading file to storage:', fileName);
-        const { error: uploadError } = await supabase.storage
-          .from('images')
-          .upload(fileName, newImage);
-        
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          throw uploadError;
-        }
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('images')
-          .getPublicUrl(fileName);
-        
-        console.log('File uploaded, public URL:', publicUrl);
-        
-        console.log('Adding image record to database');
-        const { error } = await supabase
-          .from('images')
-          .insert({
-            name: newImageName || newImage.name,
-            description: newImageDescription,
-            path: `/${fileName}`,
-            type: 'local',
-            usage_locations: [],
-          });
-        
-        if (error) {
-          console.error('Insert error:', error);
-          throw error;
-        }
+      const success = await addNewImage(
+        newImage,
+        newImageUrl,
+        newImageName,
+        newImageDescription,
+        isExternalUrl
+      );
+      
+      if (!success) {
+        throw new Error("Échec de l'ajout de l'image");
       }
       
       await fetchImages();
@@ -294,7 +238,7 @@ const ImageManager = () => {
       setIsExternalUrl(false);
       setPreviewUrl(null);
     } catch (error: any) {
-      console.error('Error adding image:', error.message);
+      console.error('Erreur lors de l\'ajout de l\'image:', error.message);
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter l'image. Veuillez réessayer.",
@@ -309,29 +253,10 @@ const ImageManager = () => {
     if (!selectedImage) return;
     
     try {
-      if (selectedImage.type === 'local') {
-        const fileName = selectedImage.path.split('/').pop();
-        if (fileName) {
-          console.log('Deleting file from storage:', fileName);
-          const { error: deleteStorageError } = await supabase.storage
-            .from('images')
-            .remove([fileName]);
-          
-          if (deleteStorageError) {
-            console.error('Error deleting storage file:', deleteStorageError);
-          }
-        }
-      }
+      const success = await deleteImage(selectedImage);
       
-      console.log('Deleting image record from database:', selectedImage.id);
-      const { error } = await supabase
-        .from('images')
-        .delete()
-        .eq('id', selectedImage.id);
-      
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
+      if (!success) {
+        throw new Error("Échec de la suppression de l'image");
       }
       
       await fetchImages();
@@ -344,7 +269,7 @@ const ImageManager = () => {
       setDeleteDialogOpen(false);
       setSelectedImage(null);
     } catch (error: any) {
-      console.error('Error deleting image:', error.message);
+      console.error('Erreur lors de la suppression de l\'image:', error.message);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer l'image. Veuillez réessayer.",
@@ -367,70 +292,6 @@ const ImageManager = () => {
     }
   };
 
-  // Vérifier si le bucket d'images existe déjà
-  const checkAndCreateBucket = async () => {
-    try {
-      console.log('Vérification du bucket images...');
-      
-      // Vérifier si le bucket existe
-      const { data: buckets, error } = await supabase.storage.listBuckets();
-      
-      if (error) {
-        console.error('Erreur lors de la vérification des buckets:', error);
-        toast({
-          title: "Mode développement",
-          description: "Fonctionnement en mode développement sans accès au stockage",
-        });
-        setBucketExists(true); // Pour le développement, on considère qu'il existe
-        return;
-      }
-      
-      console.log('Available buckets:', buckets);
-      
-      const imagesBucketExists = buckets?.some(bucket => bucket.name === 'images');
-      
-      if (!imagesBucketExists) {
-        console.log('Le bucket images n\'existe pas, tentative de création...');
-        
-        try {
-          // Le bucket n'existe pas, le créer
-          const { error: createError } = await supabase.storage.createBucket('images', {
-            public: true,
-            fileSizeLimit: 10485760, // 10MB
-          });
-          
-          if (createError) {
-            console.error('Erreur lors de la création du bucket:', createError);
-            toast({
-              title: "Mode développement",
-              description: "Fonctionnement en mode développement sans accès au stockage",
-            });
-          } else {
-            console.log('Bucket images créé avec succès');
-            setBucketExists(true);
-          }
-        } catch (createErr) {
-          console.error('Exception lors de la création du bucket:', createErr);
-          toast({
-            title: "Mode développement",
-            description: "Fonctionnement en mode développement sans accès au stockage",
-          });
-          setBucketExists(true); // Pour le développement
-        }
-      } else {
-        console.log('Le bucket images existe déjà');
-        setBucketExists(true);
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification/création du bucket:', error);
-      toast({
-        title: "Mode développement",
-        description: "Fonctionnement en mode développement sans accès au stockage",
-      });
-      setBucketExists(true); // Pour le développement
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 pt-24">
       <div className="container mx-auto py-8 px-4">
@@ -440,12 +301,23 @@ const ImageManager = () => {
             Retour au tableau de bord
           </Link>
           <h1 className="text-3xl font-serif font-bold text-abofield-dark-text">Gestionnaire d'images</h1>
-          <Button 
-            onClick={() => setNewImageDialogOpen(true)}
-            className="bg-abofield-green hover:bg-abofield-green/90"
-          >
-            <Upload className="w-4 h-4 mr-2" /> Ajouter une image
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              onClick={handleRefresh}
+              variant="outline"
+              disabled={isRefreshing}
+              className="mr-2"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} /> 
+              Rafraîchir
+            </Button>
+            <Button 
+              onClick={() => setNewImageDialogOpen(true)}
+              className="bg-abofield-green hover:bg-abofield-green/90"
+            >
+              <Upload className="w-4 h-4 mr-2" /> Ajouter une image
+            </Button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -466,60 +338,43 @@ const ImageManager = () => {
               </div>
             ) : (
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {images.length === 0 ? (
+                {filteredImages.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <p>Aucune image trouvée. Ajoutez votre première image en cliquant sur "Ajouter une image".</p>
                   </div>
                 ) : (
-                  images
-                    .filter(image => {
-                      if (currentView === 'all') return true;
-                      return image.type === currentView;
-                    })
-                    .map((image) => (
-                      <div 
-                        key={image.id}
-                        className={`p-4 rounded-lg cursor-pointer transition-all ${selectedImage?.id === image.id ? 'bg-abofield-blue/10 border border-abofield-blue' : 'bg-gray-100 hover:bg-gray-200'}`}
-                        onClick={() => handleImageSelect(image)}
-                      >
-                        <div className="flex items-center space-x-4">
-                          <div className="w-16 h-16 rounded overflow-hidden bg-gray-200 flex-shrink-0">
-                            {image.type === 'external' || image.path.startsWith('http') ? (
-                              <img 
-                                src={image.path}
-                                alt={image.name} 
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  console.error('Image load error:', image.path);
-                                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                                }}
-                              />
-                            ) : (
-                              <img 
-                                src={image.path}
-                                alt={image.name} 
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  console.error('Image load error:', image.path);
-                                  (e.target as HTMLImageElement).src = '/placeholder.svg';
-                                }}
-                              />
+                  filteredImages.map((image) => (
+                    <div 
+                      key={image.id}
+                      className={`p-4 rounded-lg cursor-pointer transition-all ${selectedImage?.id === image.id ? 'bg-abofield-blue/10 border border-abofield-blue' : 'bg-gray-100 hover:bg-gray-200'}`}
+                      onClick={() => handleImageSelect(image)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-16 h-16 rounded overflow-hidden bg-gray-200 flex-shrink-0">
+                          <img 
+                            src={getDisplayImageUrl(image)}
+                            alt={image.name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Erreur de chargement d\'image:', image.path);
+                              (e.target as HTMLImageElement).src = '/placeholder.svg';
+                            }}
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{image.name}</h3>
+                          <p className="text-sm text-gray-500 truncate">
+                            {image.path.length > 25 
+                              ? image.path.substring(0, 25) + '...' 
+                              : image.path}
+                            {image.type === 'external' && (
+                              <ExternalLink className="inline ml-1 w-3 h-3" />
                             )}
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-medium">{image.name}</h3>
-                            <p className="text-sm text-gray-500 truncate">
-                              {image.path.length > 25 
-                                ? image.path.substring(0, 25) + '...' 
-                                : image.path}
-                              {image.type === 'external' && (
-                                <ExternalLink className="inline ml-1 w-3 h-3" />
-                              )}
-                            </p>
-                          </div>
+                          </p>
                         </div>
                       </div>
-                    ))
+                    </div>
+                  ))
                 )}
               </div>
             )}
@@ -540,19 +395,15 @@ const ImageManager = () => {
                   <div className="bg-gray-100 p-4 rounded-lg mb-4">
                     <h3 className="font-medium mb-2">Image actuelle</h3>
                     <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
-                      {selectedImage.path.startsWith('http') ? (
-                        <img 
-                          src={`${selectedImage.path}?w=800&auto=format`} 
-                          alt={selectedImage.name} 
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <img 
-                          src={selectedImage.path} 
-                          alt={selectedImage.name} 
-                          className="w-full h-full object-contain"
-                        />
-                      )}
+                      <img 
+                        src={getDisplayImageUrl(selectedImage)}
+                        alt={selectedImage.name} 
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          console.error('Erreur de chargement d\'image:', selectedImage.path);
+                          (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
+                      />
                     </div>
                     {selectedImage.type === 'external' && (
                       <div className="mt-2 text-sm text-blue-600">
@@ -573,6 +424,7 @@ const ImageManager = () => {
                     <div className="space-y-2 text-sm">
                       <p><span className="font-medium">Nom:</span> {selectedImage.name}</p>
                       <p><span className="font-medium">Chemin:</span> {selectedImage.path}</p>
+                      <p><span className="font-medium">URL complète:</span> {getDisplayImageUrl(selectedImage)}</p>
                       <p><span className="font-medium">Description:</span> {selectedImage.description || "Aucune description"}</p>
                       <div>
                         <span className="font-medium">Utilisée dans:</span>
