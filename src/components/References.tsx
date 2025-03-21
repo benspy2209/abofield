@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MapPin, User } from 'lucide-react';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Project {
   id: number;
@@ -50,7 +52,7 @@ const projects: Project[] = [
     location: "Namur",
     category: "playground",
     description: "Création d'une aire de jeux éducative avec différentes zones thématiques et revêtements adaptés.",
-    image: "https://images.unsplash.com/photo-1578658890447-52bba262fb8e?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1566140967404-b8b3932483f5?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: 4,
@@ -71,7 +73,7 @@ const projects: Project[] = [
     location: "Anvers",
     category: "sports",
     description: "Rénovation de la piste d'athlétisme et installation d'un revêtement haute performance.",
-    image: "https://images.unsplash.com/photo-1557803056-a45cda8b323b?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=800&auto=format&fit=crop"
   },
   {
     id: 6,
@@ -79,13 +81,14 @@ const projects: Project[] = [
     location: "Gand",
     category: "playground",
     description: "Installation de sols amortissants personnalisés pour différentes zones thématiques du parc.",
-    image: "https://images.unsplash.com/photo-1591711696773-998b5118e042?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=800&auto=format&fit=crop"
   }
 ];
 
 const References = () => {
   const [filter, setFilter] = useState("all");
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
+  const [loading, setLoading] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -97,6 +100,11 @@ const References = () => {
   }, [filter]);
 
   useEffect(() => {
+    // Simulate image loading
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -113,6 +121,7 @@ const References = () => {
 
     return () => {
       elements.forEach((el) => observer.unobserve(el));
+      clearTimeout(timer);
     };
   }, []);
 
@@ -158,15 +167,19 @@ const References = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 fade-in-view">
           {filteredProjects.map((project) => (
-            <div key={project.id} className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 group">
-              <div className="h-56 overflow-hidden">
-                <img 
-                  src={project.image} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                />
+            <Card key={project.id} className="overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 group bg-white rounded-xl">
+              <div className="h-56 overflow-hidden relative">
+                {loading ? (
+                  <Skeleton className="w-full h-full absolute" />
+                ) : (
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                )}
               </div>
-              <div className="p-6">
+              <CardContent className="p-6">
                 <div className="flex items-center text-sm text-abofield-lightblue mb-2">
                   <MapPin size={16} className="mr-2" />
                   <span>{project.location}</span>
@@ -186,8 +199,8 @@ const References = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
