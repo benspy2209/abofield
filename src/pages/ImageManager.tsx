@@ -54,7 +54,7 @@ const ImageManager = () => {
         throw error;
       }
       
-      setImages(data as ImageItem[]);
+      setImages(data as ImageItem[] || []);
     } catch (error: any) {
       console.error('Error fetching images:', error.message);
       toast({
@@ -286,12 +286,12 @@ const ImageManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-24">
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
-          <Link to="/" className="flex items-center text-abofield-blue hover:text-abofield-lightblue">
+          <Link to="/admin-dashboard" className="flex items-center text-abofield-blue hover:text-abofield-lightblue">
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Retour au site
+            Retour au tableau de bord
           </Link>
           <h1 className="text-3xl font-serif font-bold text-abofield-dark-text">Gestionnaire d'images</h1>
           <Button 
@@ -320,9 +320,9 @@ const ImageManager = () => {
               </div>
             ) : (
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {filteredImages.length === 0 ? (
+                {images.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Aucune image trouvée.</p>
+                    <p>Aucune image trouvée. Ajoutez votre première image en cliquant sur "Ajouter une image".</p>
                   </div>
                 ) : (
                   filteredImages.map((image) => (

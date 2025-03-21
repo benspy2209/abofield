@@ -20,7 +20,7 @@ const UserMenu = () => {
   if (!user) {
     return (
       <Link to="/auth">
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 bg-white">
           <Lock className="h-4 w-4" />
           <span className="hidden md:inline">Admin</span>
         </Button>
@@ -32,7 +32,7 @@ const UserMenu = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 bg-white">
           <User className="h-4 w-4" />
           <span className="hidden md:inline">
             {profile?.full_name || user.email?.split('@')[0]}
