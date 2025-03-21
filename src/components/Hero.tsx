@@ -56,21 +56,21 @@ const Hero = () => {
               className="flex items-center justify-center space-x-2 bg-white text-abofield-blue px-6 py-3 rounded-md shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium"
             />
           </div>
-        </div>
-        
-        {/* Scroll down indicator */}
-        <div className={`absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-          <Link
-            to="services"
-            spy={true}
-            smooth={true}
-            offset={-70}
-            duration={700}
-            className="cursor-pointer flex flex-col items-center"
-          >
-            <span className="text-sm mb-2 font-light">Découvrir</span>
-            <ArrowDown className="text-white" size={24} />
-          </Link>
+          
+          {/* Scroll down indicator - moved below the buttons with margin */}
+          <div className={`mt-12 animate-bounce transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+            <Link
+              to="services"
+              spy={true}
+              smooth={true}
+              offset={-70}
+              duration={700}
+              className="cursor-pointer flex flex-col items-center"
+            >
+              <span className="text-sm mb-2 font-light">Découvrir</span>
+              <ArrowDown className="text-white" size={24} />
+            </Link>
+          </div>
         </div>
       </div>
       
