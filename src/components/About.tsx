@@ -69,8 +69,8 @@ const About = () => {
           <div className="relative">
             <div className="rounded-2xl overflow-hidden shadow-xl fade-in-view">
               <img 
-                src="https://images.unsplash.com/photo-1495556650867-99590cea3657?q=80&w=800&auto=format&fit=crop" 
-                alt="ABOFIELD installation terrain" 
+                src="https://images.unsplash.com/photo-1621607149449-280006f46376?q=80&w=800&auto=format&fit=crop" 
+                alt="Installation de revêtement de sol sportif" 
                 className="w-full h-full object-cover object-center"
               />
             </div>
