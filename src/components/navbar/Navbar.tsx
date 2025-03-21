@@ -35,22 +35,13 @@ const Navbar = () => {
       <div className="container-custom flex justify-between items-center">
         <div className="flex items-center">
           <a href="/" className="flex items-center">
-            <div className={`flex items-center bg-white rounded-full shadow-md transition-all duration-300 ${
-              isScrolled ? 'px-3 py-1' : 'px-4 py-2'
-            }`}>
-              <img 
-                src="/logo_abofield.jpeg" 
-                alt="Abofield Logo" 
-                className={`transition-all duration-300 rounded-full ${
-                  isScrolled ? 'h-10 w-10' : 'h-12 w-12'
-                } object-cover`}
-              />
-              <span className="ml-2 font-serif font-bold text-abofield-blue transition-all duration-300 ${
-                isScrolled ? 'text-lg' : 'text-xl'
-              }">
-                ABOFIELD
-              </span>
-            </div>
+            <img 
+              src="/logo_abofield.jpeg" 
+              alt="Abofield Logo" 
+              className={`transition-all duration-300 rounded-lg shadow-md ${
+                isScrolled ? 'h-12 w-auto' : 'h-16 w-auto'
+              } object-contain`}
+            />
           </a>
         </div>
 
