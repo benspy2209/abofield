@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ImageItem {
   id: string;
@@ -11,6 +12,7 @@ interface ImageItem {
   path: string;
   usedIn: string[];
   description: string;
+  type: 'local' | 'external';
 }
 
 const ImageManager = () => {
@@ -21,37 +23,89 @@ const ImageManager = () => {
       name: 'Jeux',
       path: '/jeux.jpg',
       usedIn: ['Services (Pleines de jeux)', 'Playgrounds'],
-      description: 'Photo aire de jeux colorée'
+      description: 'Photo aire de jeux colorée',
+      type: 'local'
     },
     {
       id: '2',
       name: 'Entretien',
       path: '/entretien.jpg',
       usedIn: ['Services (Entretien)', 'Maintenance'],
-      description: 'Photo entretien de revêtement'
+      description: 'Photo entretien de revêtement',
+      type: 'local'
     },
     {
       id: '3',
       name: 'Gazon',
       path: '/Gazon artificiel vert luxuriant couvrant une surface lisse.jpg',
       usedIn: ['About'],
-      description: 'Gazon artificiel vert luxuriant'
+      description: 'Gazon artificiel vert luxuriant',
+      type: 'local'
     },
     {
       id: '4',
       name: 'Terrain de sport',
       path: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e',
-      usedIn: ['Services (Terrains de sports)'],
-      description: 'Terrain de sport'
+      usedIn: ['Services (Terrains de sports)', 'Sports (Gazon synthétique)'],
+      description: 'Terrain de sport avec gazon synthétique',
+      type: 'external'
+    },
+    {
+      id: '5',
+      name: 'Hero background',
+      path: 'https://images.unsplash.com/photo-1620366392312-a882ba99461c',
+      usedIn: ['Hero (arrière-plan)'],
+      description: 'Image d\'arrière-plan de la section Hero',
+      type: 'external'
+    },
+    {
+      id: '6',
+      name: 'Multisport',
+      path: 'https://images.unsplash.com/photo-1468259275264-bbe089c59d1a',
+      usedIn: ['Sports (Multisport)'],
+      description: 'Terrain multisport',
+      type: 'external'
+    },
+    {
+      id: '7',
+      name: 'Piste d\'athlétisme',
+      path: 'https://images.unsplash.com/photo-1595231712325-c9626d50b606',
+      usedIn: ['Sports (Piste d\'athlétisme)'],
+      description: 'Piste d\'athlétisme',
+      type: 'external'
+    },
+    {
+      id: '8',
+      name: 'ET layer',
+      path: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e',
+      usedIn: ['Sports (ET layer)'],
+      description: 'Sous-couche ET layer',
+      type: 'external'
+    },
+    {
+      id: '9',
+      name: 'Logo Abofield',
+      path: '/logo_abofield.jpeg',
+      usedIn: ['Favicon', 'Métadonnées Open Graph'],
+      description: 'Logo d\'Abofield',
+      type: 'local'
     }
   ]);
   
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'all' | 'local' | 'external'>('all');
+
+  const filteredImages = images.filter(image => {
+    if (currentView === 'all') return true;
+    return image.type === currentView;
+  });
 
   const handleImageSelect = (image: ImageItem) => {
     setSelectedImage(image);
+    setNewImage(null);
+    setPreviewUrl(null);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,8 +152,17 @@ const ImageManager = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-1 bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4">Images du site</h2>
-            <div className="space-y-4">
-              {images.map((image) => (
+            
+            <Tabs value={currentView} onValueChange={(value) => setCurrentView(value as 'all' | 'local' | 'external')} className="mb-4">
+              <TabsList className="w-full">
+                <TabsTrigger value="all" className="flex-1">Toutes</TabsTrigger>
+                <TabsTrigger value="local" className="flex-1">Locales</TabsTrigger>
+                <TabsTrigger value="external" className="flex-1">Externes</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              {filteredImages.map((image) => (
                 <div 
                   key={image.id}
                   className={`p-4 rounded-lg cursor-pointer transition-all ${selectedImage?.id === image.id ? 'bg-abofield-blue/10 border border-abofield-blue' : 'bg-gray-100 hover:bg-gray-200'}`}
@@ -123,7 +186,14 @@ const ImageManager = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium">{image.name}</h3>
-                      <p className="text-sm text-gray-500 truncate">{image.path}</p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {image.path.length > 25 
+                          ? image.path.substring(0, 25) + '...' 
+                          : image.path}
+                        {image.type === 'external' && (
+                          <ExternalLink className="inline ml-1 w-3 h-3" />
+                        )}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -134,7 +204,14 @@ const ImageManager = () => {
           <div className="md:col-span-2 bg-white rounded-xl shadow-md p-6">
             {selectedImage ? (
               <div>
-                <h2 className="text-xl font-semibold mb-4">Modifier l'image: {selectedImage.name}</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Modifier l'image: {selectedImage.name}
+                  {selectedImage.type === 'external' && (
+                    <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Externe <ExternalLink className="inline ml-1 w-3 h-3" />
+                    </span>
+                  )}
+                </h2>
                 <div className="mb-6">
                   <div className="bg-gray-100 p-4 rounded-lg mb-4">
                     <h3 className="font-medium mb-2">Image actuelle</h3>
@@ -153,6 +230,18 @@ const ImageManager = () => {
                         />
                       )}
                     </div>
+                    {selectedImage.type === 'external' && (
+                      <div className="mt-2 text-sm text-blue-600">
+                        <a 
+                          href={selectedImage.path} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center hover:underline"
+                        >
+                          Voir l'URL originale <ExternalLink className="inline ml-1 w-3 h-3" />
+                        </a>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="border border-gray-200 rounded-lg p-4 mb-4">
