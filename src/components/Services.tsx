@@ -46,10 +46,12 @@ const Services = () => {
     <section id="services" className="section-padding bg-abofield-gray">
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="section-subtitle">Nos services</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2">
-            Des solutions adaptées à vos besoins
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle">Nos services</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 mt-1">
+              Des solutions adaptées à vos besoins
+            </h2>
+          </div>
           <p className="text-gray-600 mt-4">
             ABOFIELD vous accompagne dans l'aménagement et l'entretien de tous types de revêtements de sol amortissant.
           </p>

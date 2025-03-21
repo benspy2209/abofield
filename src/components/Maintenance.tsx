@@ -45,10 +45,12 @@ const Maintenance = () => {
     <section id="maintenance" className="section-padding bg-gradient-to-b from-abofield-gray/50 to-white" ref={sectionRef}>
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16 fade-in-view">
-          <span className="section-subtitle">Entretien</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2">
-            Prolongez la durée de vie de vos revêtements
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle">Entretien</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 mt-1">
+              Prolongez la durée de vie de vos revêtements
+            </h2>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

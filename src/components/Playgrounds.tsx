@@ -44,10 +44,12 @@ const Playgrounds = () => {
     <section id="playgrounds" className="section-padding bg-abofield-gray/50" ref={sectionRef}>
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="section-subtitle fade-in-view">Pleines de jeux</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 fade-in-view">
-            Jeu et sécurité avec le bon sentiment du divertissement
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle fade-in-view">Pleines de jeux</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 fade-in-view mt-1">
+              Jeu et sécurité avec le bon sentiment du divertissement
+            </h2>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">

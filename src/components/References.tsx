@@ -120,10 +120,12 @@ const References = () => {
     <section id="references" className="section-padding bg-abofield-gray/30" ref={sectionRef}>
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16 fade-in-view">
-          <span className="section-subtitle">Références</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2">
-            Nos réalisations
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle">Références</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 mt-1">
+              Nos réalisations
+            </h2>
+          </div>
           <p className="text-gray-600 mt-4">
             Découvrez nos projets récents et l'expertise que nous apportons à chaque réalisation.
           </p>

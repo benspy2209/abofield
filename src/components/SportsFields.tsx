@@ -90,10 +90,12 @@ const SportsFields = () => {
     <section id="sports" className="section-padding bg-white" ref={sectionRef}>
       <div className="container-custom">
         <div className="text-center max-w-3xl mx-auto mb-16 fade-in-view">
-          <span className="section-subtitle">Terrains de sports</span>
-          <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2">
-            La bonne surface pour chaque sport
-          </h2>
+          <div className="flex flex-col items-center">
+            <span className="section-subtitle">Terrains de sports</span>
+            <h2 className="section-title mx-auto after:left-1/4 after:right-1/4 after:w-1/2 mt-1">
+              La bonne surface pour chaque sport
+            </h2>
+          </div>
           <p className="text-gray-600 mt-4">
             ABOFIELD veille à ce que les terrains de football, les courts de tennis, les espaces multisports, les pistes d'athlétisme disposent des revêtements appropriés, à l'extérieur comme à l'intérieur, qu'il pleuve ou qu'il fasse beau.
           </p>
