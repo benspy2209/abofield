@@ -34,8 +34,20 @@ const Navbar = () => {
     >
       <div className="container-custom flex justify-between items-center">
         <div className="flex items-center">
-          <a href="/" className="text-2xl font-serif font-bold text-abofield-blue">
-            ABOFIELD
+          <a href="/" className="flex items-center">
+            <picture>
+              <source srcSet="/logo_abofield.webp" type="image/webp" />
+              <img 
+                src="/logo_abofield.jpeg" 
+                alt="Abofield Logo" 
+                className={`transition-all duration-300 ${
+                  isScrolled ? 'h-12' : 'h-16'
+                }`}
+              />
+            </picture>
+            <span className="ml-3 text-2xl font-serif font-bold text-abofield-blue hidden sm:inline-block">
+              ABOFIELD
+            </span>
           </a>
         </div>
 
