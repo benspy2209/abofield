@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				abofield: {
+					blue: '#1A5F7A',
+					lightblue: '#159895',
+					green: '#57C5B6',
+					lightgreen: '#A9D6C8',
+					'dark-text': '#1C2B35',
+					'light-text': '#F7F7F7',
+					gray: '#F1F5F9'
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +94,55 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				fadeIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				slideUp: {
+					'0%': { transform: 'translateY(20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				slideDown: {
+					'0%': { transform: 'translateY(-20px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				slideInLeft: {
+					'0%': { transform: 'translateX(-20px)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' }
+				},
+				slideInRight: {
+					'0%': { transform: 'translateX(20px)', opacity: '0' },
+					'100%': { transform: 'translateX(0)', opacity: '1' }
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				pulse: {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.8' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fadeIn 0.5s ease-out forwards',
+				'slide-up': 'slideUp 0.6s ease-out forwards',
+				'slide-down': 'slideDown 0.6s ease-out forwards',
+				'slide-in-left': 'slideInLeft 0.6s ease-out forwards',
+				'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+				'float': 'float 4s ease-in-out infinite',
+				'pulse': 'pulse 3s ease-in-out infinite'
+			},
+			fontFamily: {
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'serif': ['Playfair Display', 'Georgia', 'serif'],
+			},
+			backgroundImage: {
+				'hero-pattern': 'url("https://images.unsplash.com/photo-1607461184224-8c7da2cfc383?q=80&w=1000&auto=format&fit=crop")',
+				'subtle-dots': 'radial-gradient(#E2E8F0 0.5px, transparent 0.5px)',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
