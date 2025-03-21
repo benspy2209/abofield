@@ -1,101 +1,72 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Upload, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface ImageItem {
   id: string;
   name: string;
   path: string;
-  usedIn: string[];
-  description: string;
+  usage_locations?: string[];
+  description?: string;
   type: 'local' | 'external';
 }
 
 const ImageManager = () => {
   const { toast } = useToast();
-  const [images, setImages] = useState<ImageItem[]>([
-    {
-      id: '1',
-      name: 'Jeux',
-      path: '/jeux.jpg',
-      usedIn: ['Services (Pleines de jeux)', 'Playgrounds'],
-      description: 'Photo aire de jeux colorée',
-      type: 'local'
-    },
-    {
-      id: '2',
-      name: 'Entretien',
-      path: '/entretien.jpg',
-      usedIn: ['Services (Entretien)', 'Maintenance'],
-      description: 'Photo entretien de revêtement',
-      type: 'local'
-    },
-    {
-      id: '3',
-      name: 'Gazon',
-      path: '/Gazon artificiel vert luxuriant couvrant une surface lisse.jpg',
-      usedIn: ['About'],
-      description: 'Gazon artificiel vert luxuriant',
-      type: 'local'
-    },
-    {
-      id: '4',
-      name: 'Terrain de sport',
-      path: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e',
-      usedIn: ['Services (Terrains de sports)', 'Sports (Gazon synthétique)'],
-      description: 'Terrain de sport avec gazon synthétique',
-      type: 'external'
-    },
-    {
-      id: '5',
-      name: 'Hero background',
-      path: 'https://images.unsplash.com/photo-1620366392312-a882ba99461c',
-      usedIn: ['Hero (arrière-plan)'],
-      description: 'Image d\'arrière-plan de la section Hero',
-      type: 'external'
-    },
-    {
-      id: '6',
-      name: 'Multisport',
-      path: 'https://images.unsplash.com/photo-1468259275264-bbe089c59d1a',
-      usedIn: ['Sports (Multisport)'],
-      description: 'Terrain multisport',
-      type: 'external'
-    },
-    {
-      id: '7',
-      name: 'Piste d\'athlétisme',
-      path: 'https://images.unsplash.com/photo-1595231712325-c9626d50b606',
-      usedIn: ['Sports (Piste d\'athlétisme)'],
-      description: 'Piste d\'athlétisme',
-      type: 'external'
-    },
-    {
-      id: '8',
-      name: 'ET layer',
-      path: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e',
-      usedIn: ['Sports (ET layer)'],
-      description: 'Sous-couche ET layer',
-      type: 'external'
-    },
-    {
-      id: '9',
-      name: 'Logo Abofield',
-      path: '/logo_abofield.jpeg',
-      usedIn: ['Favicon', 'Métadonnées Open Graph'],
-      description: 'Logo d\'Abofield',
-      type: 'local'
-    }
-  ]);
-  
+  const { isAdmin } = useAuth();
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
   const [newImage, setNewImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<'all' | 'local' | 'external'>('all');
+  const [newImageDialogOpen, setNewImageDialogOpen] = useState(false);
+  const [isExternalUrl, setIsExternalUrl] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState('');
+  const [newImageName, setNewImageName] = useState('');
+  const [newImageDescription, setNewImageDescription] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('images')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
+      }
+      
+      setImages(data as ImageItem[]);
+    } catch (error: any) {
+      console.error('Error fetching images:', error.message);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les images. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const filteredImages = images.filter(image => {
     if (currentView === 'all') return true;
@@ -122,31 +93,234 @@ const ImageManager = () => {
     }
   };
 
-  const handleImageUpdate = () => {
-    if (!selectedImage || !newImage) return;
+  const handleImageUpdate = async () => {
+    if (!selectedImage) return;
     
-    // In a real implementation, you would upload the file to your server
-    // For now, we'll just simulate the update
-    toast({
-      title: "Fonctionnalité simulée",
-      description: `L'image "${selectedImage.name}" serait remplacée par "${newImage.name}". Dans une implémentation complète avec Supabase, cette image serait téléchargée sur le serveur.`,
-    });
+    setIsUploading(true);
     
-    // Reset form
-    setNewImage(null);
-    setPreviewUrl(null);
-    setSelectedImage(null);
+    try {
+      if (newImage) {
+        // Si c'est une image locale, télécharger le nouveau fichier
+        if (selectedImage.type === 'local') {
+          // Générer un nom de fichier unique
+          const fileExt = newImage.name.split('.').pop();
+          const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+          const filePath = `/${fileName}`;
+          
+          // Télécharger le fichier dans le bucket de stockage
+          const { error: uploadError } = await supabase.storage
+            .from('images')
+            .upload(fileName, newImage);
+          
+          if (uploadError) {
+            throw uploadError;
+          }
+          
+          // Récupérer l'URL du fichier téléchargé
+          const { data: { publicUrl } } = supabase.storage
+            .from('images')
+            .getPublicUrl(fileName);
+          
+          // Mettre à jour l'enregistrement dans la base de données
+          const { error: updateError } = await supabase
+            .from('images')
+            .update({
+              path: filePath,
+              updated_at: new Date(),
+            })
+            .eq('id', selectedImage.id);
+          
+          if (updateError) {
+            throw updateError;
+          }
+        }
+      }
+      
+      // Rafraîchir la liste des images
+      await fetchImages();
+      
+      toast({
+        title: "Succès",
+        description: "L'image a été mise à jour avec succès.",
+      });
+      
+      // Réinitialiser le formulaire
+      setNewImage(null);
+      setPreviewUrl(null);
+      setSelectedImage(null);
+    } catch (error: any) {
+      console.error('Error updating image:', error.message);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour l'image. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAddNewImage = async () => {
+    setIsUploading(true);
+    
+    try {
+      if (isExternalUrl) {
+        // Pour les images externes, ajouter simplement l'URL
+        const { error } = await supabase
+          .from('images')
+          .insert({
+            name: newImageName,
+            description: newImageDescription,
+            path: newImageUrl,
+            type: 'external',
+            usage_locations: [],
+          });
+        
+        if (error) {
+          throw error;
+        }
+      } else if (newImage) {
+        // Pour les images locales, télécharger le fichier
+        const fileExt = newImage.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+        
+        // Télécharger le fichier dans le bucket de stockage
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(fileName, newImage);
+        
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        // Récupérer l'URL du fichier téléchargé
+        const { data: { publicUrl } } = supabase.storage
+          .from('images')
+          .getPublicUrl(fileName);
+        
+        // Ajouter l'enregistrement dans la base de données
+        const { error } = await supabase
+          .from('images')
+          .insert({
+            name: newImageName || newImage.name,
+            description: newImageDescription,
+            path: `/${fileName}`,
+            type: 'local',
+            usage_locations: [],
+          });
+        
+        if (error) {
+          throw error;
+        }
+      }
+      
+      // Rafraîchir la liste des images
+      await fetchImages();
+      
+      toast({
+        title: "Succès",
+        description: "L'image a été ajoutée avec succès.",
+      });
+      
+      // Réinitialiser le formulaire et fermer la boîte de dialogue
+      setNewImageDialogOpen(false);
+      setNewImage(null);
+      setNewImageUrl('');
+      setNewImageName('');
+      setNewImageDescription('');
+      setIsExternalUrl(false);
+      setPreviewUrl(null);
+    } catch (error: any) {
+      console.error('Error adding image:', error.message);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter l'image. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    if (!selectedImage) return;
+    
+    try {
+      // Si c'est une image locale, supprimer le fichier du stockage
+      if (selectedImage.type === 'local') {
+        const fileName = selectedImage.path.split('/').pop();
+        if (fileName) {
+          const { error: deleteStorageError } = await supabase.storage
+            .from('images')
+            .remove([fileName]);
+          
+          if (deleteStorageError) {
+            console.error('Error deleting storage file:', deleteStorageError);
+          }
+        }
+      }
+      
+      // Supprimer l'enregistrement de la base de données
+      const { error } = await supabase
+        .from('images')
+        .delete()
+        .eq('id', selectedImage.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Rafraîchir la liste des images
+      await fetchImages();
+      
+      toast({
+        title: "Succès",
+        description: "L'image a été supprimée avec succès.",
+      });
+      
+      // Réinitialiser et fermer la boîte de dialogue
+      setDeleteDialogOpen(false);
+      setSelectedImage(null);
+    } catch (error: any) {
+      console.error('Error deleting image:', error.message);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'image. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleNewImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setNewImage(file);
+      setNewImageName(file.name.split('.')[0]);
+      
+      // Create a preview URL
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        setPreviewUrl(fileReader.result as string);
+      };
+      fileReader.readAsDataURL(file);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center mb-8">
-          <Link to="/" className="flex items-center text-abofield-blue hover:text-abofield-lightblue mr-4">
+        <div className="flex items-center justify-between mb-8">
+          <Link to="/" className="flex items-center text-abofield-blue hover:text-abofield-lightblue">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Retour au site
           </Link>
           <h1 className="text-3xl font-serif font-bold text-abofield-dark-text">Gestionnaire d'images</h1>
+          <Button 
+            onClick={() => setNewImageDialogOpen(true)}
+            className="bg-abofield-green hover:bg-abofield-green/90"
+          >
+            <Upload className="w-4 h-4 mr-2" /> Ajouter une image
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -161,44 +335,56 @@ const ImageManager = () => {
               </TabsList>
             </Tabs>
             
-            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-              {filteredImages.map((image) => (
-                <div 
-                  key={image.id}
-                  className={`p-4 rounded-lg cursor-pointer transition-all ${selectedImage?.id === image.id ? 'bg-abofield-blue/10 border border-abofield-blue' : 'bg-gray-100 hover:bg-gray-200'}`}
-                  onClick={() => handleImageSelect(image)}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded overflow-hidden bg-gray-200 flex-shrink-0">
-                      {image.path.startsWith('http') ? (
-                        <img 
-                          src={`${image.path}?w=100&h=100&fit=crop&auto=format`} 
-                          alt={image.name} 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <img 
-                          src={image.path} 
-                          alt={image.name} 
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium">{image.name}</h3>
-                      <p className="text-sm text-gray-500 truncate">
-                        {image.path.length > 25 
-                          ? image.path.substring(0, 25) + '...' 
-                          : image.path}
-                        {image.type === 'external' && (
-                          <ExternalLink className="inline ml-1 w-3 h-3" />
-                        )}
-                      </p>
-                    </div>
+            {isLoading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-abofield-blue"></div>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {filteredImages.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Aucune image trouvée.</p>
                   </div>
-                </div>
-              ))}
-            </div>
+                ) : (
+                  filteredImages.map((image) => (
+                    <div 
+                      key={image.id}
+                      className={`p-4 rounded-lg cursor-pointer transition-all ${selectedImage?.id === image.id ? 'bg-abofield-blue/10 border border-abofield-blue' : 'bg-gray-100 hover:bg-gray-200'}`}
+                      onClick={() => handleImageSelect(image)}
+                    >
+                      <div className="flex items-center space-x-4">
+                        <div className="w-16 h-16 rounded overflow-hidden bg-gray-200 flex-shrink-0">
+                          {image.path.startsWith('http') ? (
+                            <img 
+                              src={`${image.path}?w=100&h=100&fit=crop&auto=format`} 
+                              alt={image.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <img 
+                              src={image.path} 
+                              alt={image.name} 
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium">{image.name}</h3>
+                          <p className="text-sm text-gray-500 truncate">
+                            {image.path.length > 25 
+                              ? image.path.substring(0, 25) + '...' 
+                              : image.path}
+                            {image.type === 'external' && (
+                              <ExternalLink className="inline ml-1 w-3 h-3" />
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
           
           <div className="md:col-span-2 bg-white rounded-xl shadow-md p-6">
@@ -249,20 +435,34 @@ const ImageManager = () => {
                     <div className="space-y-2 text-sm">
                       <p><span className="font-medium">Nom:</span> {selectedImage.name}</p>
                       <p><span className="font-medium">Chemin:</span> {selectedImage.path}</p>
-                      <p><span className="font-medium">Description:</span> {selectedImage.description}</p>
+                      <p><span className="font-medium">Description:</span> {selectedImage.description || "Aucune description"}</p>
                       <div>
                         <span className="font-medium">Utilisée dans:</span>
-                        <ul className="list-disc list-inside ml-2 mt-1">
-                          {selectedImage.usedIn.map((location, idx) => (
-                            <li key={idx}>{location}</li>
-                          ))}
-                        </ul>
+                        {selectedImage.usage_locations && selectedImage.usage_locations.length > 0 ? (
+                          <ul className="list-disc list-inside ml-2 mt-1">
+                            {selectedImage.usage_locations.map((location, idx) => (
+                              <li key={idx}>{location}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="ml-2 mt-1 text-gray-500">Non utilisée</p>
+                        )}
                       </div>
                     </div>
                   </div>
                   
                   <div className="border border-gray-200 rounded-lg p-4">
-                    <h3 className="font-medium mb-4">Remplacer l'image</h3>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-medium">Remplacer l'image</h3>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteDialogOpen(true)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+                      </Button>
+                    </div>
+                    
                     <div className="mb-4">
                       <label htmlFor="image-upload" className="block mb-2 text-sm font-medium">
                         Sélectionner une nouvelle image
@@ -306,11 +506,15 @@ const ImageManager = () => {
                         Annuler
                       </Button>
                       <Button
-                        disabled={!newImage}
+                        disabled={!newImage || isUploading}
                         onClick={handleImageUpdate}
                         className="bg-abofield-blue hover:bg-abofield-blue/90"
                       >
-                        <Upload className="w-4 h-4 mr-2" /> Mettre à jour
+                        {isUploading ? "Mise à jour..." : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" /> Mettre à jour
+                          </>
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -329,23 +533,136 @@ const ImageManager = () => {
             )}
           </div>
         </div>
-        
-        <div className="mt-12 bg-abofield-blue/10 rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Prochaines étapes</h2>
-          <p className="mb-4">
-            Cette interface est une simulation. Pour une fonctionnalité complète de gestion des images, nous devons connecter cette application à Supabase qui fournira :
-          </p>
-          <ul className="list-disc list-inside space-y-2 mb-6">
-            <li>Un stockage sécurisé pour vos images</li>
-            <li>La possibilité de télécharger de nouvelles images</li>
-            <li>Une gestion des permissions d'accès</li>
-            <li>Des URLs optimisées pour vos images</li>
-          </ul>
-          <Button className="bg-abofield-green hover:bg-abofield-green/90">
-            Configurer Supabase
-          </Button>
-        </div>
       </div>
+
+      {/* Boîte de dialogue pour ajouter une nouvelle image */}
+      <Dialog open={newImageDialogOpen} onOpenChange={setNewImageDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Ajouter une nouvelle image</DialogTitle>
+            <DialogDescription>
+              Téléchargez une image ou ajoutez une URL externe.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="external-url"
+                checked={isExternalUrl}
+                onCheckedChange={setIsExternalUrl}
+              />
+              <Label htmlFor="external-url">URL externe</Label>
+            </div>
+            
+            {isExternalUrl ? (
+              <div className="space-y-4">
+                <div className="grid w-full gap-1.5">
+                  <Label htmlFor="image-url">URL de l'image</Label>
+                  <Input
+                    id="image-url"
+                    placeholder="https://example.com/image.jpg"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                  />
+                </div>
+                
+                {newImageUrl && (
+                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                    <img 
+                      src={newImageUrl} 
+                      alt="External preview" 
+                      className="w-full h-full object-contain"
+                      onError={(e) => (e.currentTarget.style.display = 'none')}
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid w-full gap-1.5">
+                  <Label htmlFor="new-image-upload">Fichier image</Label>
+                  <Input
+                    id="new-image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleNewImageFileChange}
+                    className="cursor-pointer"
+                  />
+                </div>
+                
+                {previewUrl && (
+                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                    <img 
+                      src={previewUrl} 
+                      alt="File preview" 
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div className="grid w-full gap-1.5">
+              <Label htmlFor="image-name">Nom de l'image</Label>
+              <Input
+                id="image-name"
+                placeholder="Logo Abofield"
+                value={newImageName}
+                onChange={(e) => setNewImageName(e.target.value)}
+              />
+            </div>
+            
+            <div className="grid w-full gap-1.5">
+              <Label htmlFor="image-description">Description (optionnel)</Label>
+              <Textarea
+                id="image-description"
+                placeholder="Description de l'image..."
+                value={newImageDescription}
+                onChange={(e) => setNewImageDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter className="flex space-x-2 sm:space-x-0">
+            <Button variant="outline" onClick={() => setNewImageDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleAddNewImage}
+              disabled={isUploading || (!newImage && !newImageUrl) || !newImageName}
+              className="bg-abofield-green hover:bg-abofield-green/90"
+            >
+              {isUploading ? "Ajout en cours..." : "Ajouter l'image"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Boîte de dialogue de confirmation de suppression */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmer la suppression</DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer cette image ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter className="flex space-x-2 sm:space-x-0">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleDeleteImage}
+              variant="destructive"
+            >
+              Supprimer définitivement
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
