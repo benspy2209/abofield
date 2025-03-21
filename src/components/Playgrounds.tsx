@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Check, Shield, Palette, Droplets } from 'lucide-react';
+import DownloadBrochureForm from './DownloadBrochureForm';
 
 interface FeatureProps {
   icon: React.ReactNode;
@@ -89,9 +90,12 @@ const Playgrounds = () => {
             </div>
             
             <div className="mt-8 fade-in-view">
-              <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="btn-primary">
-                Télécharger notre documentation
-              </a>
+              <DownloadBrochureForm 
+                buttonText="Télécharger notre documentation"
+                pdfUrl="/Brochure_Abofield_fr.pdf"
+                buttonVariant="default"
+                className="bg-abofield-blue hover:bg-abofield-blue/90 text-white"
+              />
             </div>
           </div>
           

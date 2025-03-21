@@ -83,7 +83,7 @@ const NavDesktopMenu = () => {
       
       <DownloadBrochureForm 
         buttonText="Brochure"
-        pdfUrl="/brochure.pdf"
+        pdfUrl="/Brochure_Abofield_fr.pdf"
         className="flex items-center space-x-2 btn-primary"
         showIcon={true}
       />

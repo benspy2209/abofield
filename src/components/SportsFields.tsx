@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CheckCircle } from 'lucide-react';
+import DownloadBrochureForm from './DownloadBrochureForm';
 
 interface SportCategory {
   id: string;
@@ -139,9 +140,12 @@ const SportsFields = () => {
                     </div>
                     
                     <div className="mt-8">
-                      <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="btn-secondary">
-                        Voir les spécifications techniques
-                      </a>
+                      <DownloadBrochureForm 
+                        buttonText="Voir les spécifications techniques"
+                        pdfUrl="/Brochure_Abofield_fr.pdf"
+                        buttonVariant="secondary"
+                        className="bg-abofield-blue/10 hover:bg-abofield-blue/20 text-abofield-blue"
+                      />
                     </div>
                   </div>
                   

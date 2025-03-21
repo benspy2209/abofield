@@ -105,7 +105,7 @@ const NavMobileMenu = ({ isOpen, onClose }: NavMobileMenuProps) => {
         
         <DownloadBrochureForm 
           buttonText="Brochure"
-          pdfUrl="/brochure.pdf"
+          pdfUrl="/Brochure_Abofield_fr.pdf"
           className="flex items-center space-x-2 btn-primary w-full justify-center"
           showIcon={true}
         />

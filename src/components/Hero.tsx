@@ -52,7 +52,7 @@ const Hero = () => {
             
             <DownloadBrochureForm 
               buttonText="Télécharger la brochure"
-              pdfUrl="/brochure.pdf"
+              pdfUrl="/Brochure_Abofield_fr.pdf"
               className="flex items-center justify-center space-x-2 bg-white text-abofield-blue px-6 py-3 rounded-md shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium"
             />
           </div>
