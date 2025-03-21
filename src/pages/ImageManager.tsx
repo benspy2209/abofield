@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Upload, ExternalLink, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -84,7 +83,6 @@ const ImageManager = () => {
       const file = e.target.files[0];
       setNewImage(file);
       
-      // Create a preview URL
       const fileReader = new FileReader();
       fileReader.onload = () => {
         setPreviewUrl(fileReader.result as string);
@@ -100,14 +98,11 @@ const ImageManager = () => {
     
     try {
       if (newImage) {
-        // Si c'est une image locale, télécharger le nouveau fichier
         if (selectedImage.type === 'local') {
-          // Générer un nom de fichier unique
           const fileExt = newImage.name.split('.').pop();
           const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
           const filePath = `/${fileName}`;
           
-          // Télécharger le fichier dans le bucket de stockage
           const { error: uploadError } = await supabase.storage
             .from('images')
             .upload(fileName, newImage);
@@ -116,17 +111,15 @@ const ImageManager = () => {
             throw uploadError;
           }
           
-          // Récupérer l'URL du fichier téléchargé
           const { data: { publicUrl } } = supabase.storage
             .from('images')
             .getPublicUrl(fileName);
           
-          // Mettre à jour l'enregistrement dans la base de données
           const { error: updateError } = await supabase
             .from('images')
             .update({
               path: filePath,
-              updated_at: new Date(),
+              updated_at: new Date().toISOString(),
             })
             .eq('id', selectedImage.id);
           
@@ -136,7 +129,6 @@ const ImageManager = () => {
         }
       }
       
-      // Rafraîchir la liste des images
       await fetchImages();
       
       toast({
@@ -144,7 +136,6 @@ const ImageManager = () => {
         description: "L'image a été mise à jour avec succès.",
       });
       
-      // Réinitialiser le formulaire
       setNewImage(null);
       setPreviewUrl(null);
       setSelectedImage(null);
@@ -165,7 +156,6 @@ const ImageManager = () => {
     
     try {
       if (isExternalUrl) {
-        // Pour les images externes, ajouter simplement l'URL
         const { error } = await supabase
           .from('images')
           .insert({
@@ -180,11 +170,9 @@ const ImageManager = () => {
           throw error;
         }
       } else if (newImage) {
-        // Pour les images locales, télécharger le fichier
         const fileExt = newImage.name.split('.').pop();
         const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
         
-        // Télécharger le fichier dans le bucket de stockage
         const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(fileName, newImage);
@@ -193,12 +181,10 @@ const ImageManager = () => {
           throw uploadError;
         }
         
-        // Récupérer l'URL du fichier téléchargé
         const { data: { publicUrl } } = supabase.storage
           .from('images')
           .getPublicUrl(fileName);
         
-        // Ajouter l'enregistrement dans la base de données
         const { error } = await supabase
           .from('images')
           .insert({
@@ -214,7 +200,6 @@ const ImageManager = () => {
         }
       }
       
-      // Rafraîchir la liste des images
       await fetchImages();
       
       toast({
@@ -222,7 +207,6 @@ const ImageManager = () => {
         description: "L'image a été ajoutée avec succès.",
       });
       
-      // Réinitialiser le formulaire et fermer la boîte de dialogue
       setNewImageDialogOpen(false);
       setNewImage(null);
       setNewImageUrl('');
@@ -246,7 +230,6 @@ const ImageManager = () => {
     if (!selectedImage) return;
     
     try {
-      // Si c'est une image locale, supprimer le fichier du stockage
       if (selectedImage.type === 'local') {
         const fileName = selectedImage.path.split('/').pop();
         if (fileName) {
@@ -260,7 +243,6 @@ const ImageManager = () => {
         }
       }
       
-      // Supprimer l'enregistrement de la base de données
       const { error } = await supabase
         .from('images')
         .delete()
@@ -270,7 +252,6 @@ const ImageManager = () => {
         throw error;
       }
       
-      // Rafraîchir la liste des images
       await fetchImages();
       
       toast({
@@ -278,7 +259,6 @@ const ImageManager = () => {
         description: "L'image a été supprimée avec succès.",
       });
       
-      // Réinitialiser et fermer la boîte de dialogue
       setDeleteDialogOpen(false);
       setSelectedImage(null);
     } catch (error: any) {
@@ -297,7 +277,6 @@ const ImageManager = () => {
       setNewImage(file);
       setNewImageName(file.name.split('.')[0]);
       
-      // Create a preview URL
       const fileReader = new FileReader();
       fileReader.onload = () => {
         setPreviewUrl(fileReader.result as string);
@@ -535,7 +514,6 @@ const ImageManager = () => {
         </div>
       </div>
 
-      {/* Boîte de dialogue pour ajouter une nouvelle image */}
       <Dialog open={newImageDialogOpen} onOpenChange={setNewImageDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -640,7 +618,6 @@ const ImageManager = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Boîte de dialogue de confirmation de suppression */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
