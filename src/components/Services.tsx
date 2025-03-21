@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-scroll';
-import { ArrowRight } from 'lucide-react';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link as RouterLink } from 'react-router-dom';
+import { ArrowRight, Image } from 'lucide-react';
 
 const ServiceCard = ({ 
   title, 
@@ -26,7 +27,7 @@ const ServiceCard = ({
       <div className="p-6">
         <h3 className="text-xl font-serif font-semibold mb-3 text-abofield-dark-text">{title}</h3>
         <p className="text-gray-600 mb-4">{description}</p>
-        <Link
+        <ScrollLink
           to={linkTo}
           spy={true}
           smooth={true}
@@ -35,7 +36,7 @@ const ServiceCard = ({
           className="inline-flex items-center text-abofield-blue hover:text-abofield-lightblue transition-colors cursor-pointer font-medium"
         >
           En savoir plus <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-        </Link>
+        </ScrollLink>
       </div>
     </div>
   );
@@ -55,6 +56,13 @@ const Services = () => {
           <p className="text-gray-600 mt-4">
             ABOFIELD vous accompagne dans l'aménagement et l'entretien de tous types de revêtements de sol amortissant.
           </p>
+          
+          <RouterLink 
+            to="/image-manager" 
+            className="inline-flex items-center mt-4 text-abofield-green hover:text-abofield-green/80 text-sm font-medium"
+          >
+            <Image className="w-4 h-4 mr-1" /> Gérer les images
+          </RouterLink>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
