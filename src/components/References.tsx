@@ -39,7 +39,7 @@ const projects: Project[] = [
     location: "Liège",
     category: "sports",
     description: "Installation d'un gazon synthétique de dernière génération avec sous-couche amortissante ET layer.",
-    image: "https://images.unsplash.com/photo-1521731299294-7325eeaec317?q=80&w=800&auto=format&fit=crop",
+    image: "/lovable-uploads/da1703eb-7404-4995-b64d-fa43580588eb.png",
     testimonial: {
       name: "Thomas Leroy",
       role: "Président du club",
