@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
@@ -10,8 +9,9 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Adresse e-mail invalide" }),
@@ -35,8 +35,8 @@ const Auth = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [emailConfirmationError, setEmailConfirmationError] = useState(false);
   
-  // Récupérer l'URL de redirection des paramètres d'URL
   const from = new URLSearchParams(location.search).get('redirect') || '/';
   
   const loginForm = useForm<LoginFormValues>({
@@ -57,6 +57,16 @@ const Auth = () => {
     },
   });
   
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const error = urlParams.get('error');
+    const errorDescription = urlParams.get('error_description');
+    
+    if (error === 'email_not_confirmed' || (errorDescription && errorDescription.includes('Email not confirmed'))) {
+      setEmailConfirmationError(true);
+    }
+  }, [location]);
+  
   const onLoginSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
     
@@ -64,6 +74,16 @@ const Auth = () => {
       const { error } = await signIn(values.email, values.password);
       
       if (error) {
+        if (error.message && error.message.includes('Email not confirmed')) {
+          setEmailConfirmationError(true);
+          toast({
+            title: "Email non confirmé",
+            description: "Pour les besoins du développement, vous pouvez désactiver la vérification d'email dans Supabase.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         toast({
           title: "Erreur de connexion",
           description: error.message || "Vérifiez vos identifiants et réessayez.",
@@ -77,7 +97,6 @@ const Auth = () => {
         description: "Bienvenue sur Abofield",
       });
       
-      // Rediriger vers la page demandée ou le tableau de bord
       navigate(from);
     } catch (error: any) {
       toast({
@@ -110,7 +129,6 @@ const Auth = () => {
         description: "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
       });
       
-      // Revenir à l'onglet de connexion après l'inscription
       document.getElementById('login-tab')?.click();
     } catch (error: any) {
       toast({
@@ -142,6 +160,15 @@ const Auth = () => {
               Connectez-vous pour accéder à l'espace d'administration
             </p>
           </div>
+          
+          {emailConfirmationError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Votre email n'a pas été confirmé. Pour les besoins du développement, vous pouvez désactiver la vérification d'email dans les paramètres de Supabase.
+              </AlertDescription>
+            </Alert>
+          )}
           
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid grid-cols-2 mb-6">
@@ -290,6 +317,7 @@ const Auth = () => {
       <div className="bg-gray-100 py-4">
         <div className="container mx-auto px-4 text-center text-sm text-gray-600">
           <p>Pour devenir administrateur, contactez un administrateur existant après votre inscription.</p>
+          <p className="mt-2">Pour le développement, vous pouvez désactiver la vérification d'email dans les paramètres Supabase.</p>
         </div>
       </div>
     </div>
