@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-scroll';
-import { Facebook, Instagram, Linkedin, Mail, ArrowUp } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, ArrowUp, Globe } from 'lucide-react';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -175,16 +175,35 @@ const Footer = () => {
                 <span className="text-white/80">Adresse:</span>
                 <span className="ml-2 text-white/80">123 Avenue des Revêtements, 1000 Bruxelles, Belgique</span>
               </li>
+              <li className="flex items-start">
+                <span className="text-white/80">Contact:</span>
+                <div className="ml-2 text-white/80">
+                  <p>Otman BENCHERIF</p>
+                  <p>Managing Partner</p>
+                </div>
+              </li>
+              <li className="flex items-center">
+                <span className="text-white/80">Mobile:</span>
+                <a href="tel:+32485549571" className="ml-2 text-white/80 hover:text-white transition-colors">
+                  +32 (0)485 54.95.71
+                </a>
+              </li>
               <li className="flex items-center">
                 <span className="text-white/80">Téléphone:</span>
-                <a href="tel:+32123456789" className="ml-2 text-white/80 hover:text-white transition-colors">
-                  +32 123 456 789
+                <a href="tel:+3224302579" className="ml-2 text-white/80 hover:text-white transition-colors">
+                  +32 (0)2 430.25.79
                 </a>
               </li>
               <li className="flex items-center">
                 <span className="text-white/80">Email:</span>
                 <a href="mailto:info@abofield.be" className="ml-2 text-white/80 hover:text-white transition-colors">
                   info@abofield.be
+                </a>
+              </li>
+              <li className="flex items-center">
+                <span className="text-white/80">Web:</span>
+                <a href="https://www.abofield.be" target="_blank" rel="noopener noreferrer" className="ml-2 text-white/80 hover:text-white transition-colors">
+                  www.abofield.be
                 </a>
               </li>
             </ul>

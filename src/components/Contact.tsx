@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, Globe } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -121,6 +121,7 @@ const Contact = () => {
                   title="Adresse"
                   details={
                     <div>
+                      <p>ABOFIELD srl/ BV</p>
                       <p>123 Avenue des Revêtements</p>
                       <p>1000 Bruxelles, Belgique</p>
                     </div>
@@ -131,9 +132,20 @@ const Contact = () => {
                   icon={<Phone size={20} />}
                   title="Téléphone"
                   details={
-                    <a href="tel:+32123456789" className="hover:text-abofield-blue transition-colors">
-                      +32 123 456 789
-                    </a>
+                    <div>
+                      <p>
+                        <span className="font-medium">Mobile: </span>
+                        <a href="tel:+32485549571" className="hover:text-abofield-blue transition-colors">
+                          +32 (0)485 54.95.71
+                        </a>
+                      </p>
+                      <p>
+                        <span className="font-medium">Fixe: </span>
+                        <a href="tel:+3224302579" className="hover:text-abofield-blue transition-colors">
+                          +32 (0)2 430.25.79
+                        </a>
+                      </p>
+                    </div>
                   }
                 />
                 
@@ -148,6 +160,16 @@ const Contact = () => {
                 />
                 
                 <ContactInfo 
+                  icon={<Globe size={20} />}
+                  title="Site web"
+                  details={
+                    <a href="https://www.abofield.be" target="_blank" rel="noopener noreferrer" className="hover:text-abofield-blue transition-colors">
+                      www.abofield.be
+                    </a>
+                  }
+                />
+                
+                <ContactInfo 
                   icon={<Clock size={20} />}
                   title="Horaires d'ouverture"
                   details={
@@ -157,6 +179,11 @@ const Contact = () => {
                     </div>
                   }
                 />
+                
+                <div className="pt-2">
+                  <p className="font-medium">Otman BENCHERIF</p>
+                  <p className="text-gray-600">Managing Partner</p>
+                </div>
               </div>
             </div>
             
