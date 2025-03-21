@@ -32,7 +32,7 @@ export function useSupabaseImages() {
         id: image.id,
         name: image.name,
         description: image.description,
-        type: image.type,
+        type: image.type as 'local' | 'external' | 'supabase',
         usedIn: image.used_in || [],
         path: image.type === 'supabase' 
           ? getSupabaseImageUrl(image.bucket_name, image.file_path)
@@ -61,7 +61,7 @@ export function useSupabaseImages() {
             path: '/jeux.jpg',
             usedIn: ['Services (Pleines de jeux)', 'Playgrounds'],
             description: 'Photo aire de jeux colorée',
-            type: 'local',
+            type: 'local' as 'local' | 'external' | 'supabase',
           },
           {
             id: '2',
@@ -69,7 +69,7 @@ export function useSupabaseImages() {
             path: '/entretien.jpg',
             usedIn: ['Services (Entretien)', 'Maintenance'],
             description: 'Photo entretien de revêtement',
-            type: 'local',
+            type: 'local' as 'local' | 'external' | 'supabase',
           },
           {
             id: '3',
@@ -77,7 +77,7 @@ export function useSupabaseImages() {
             path: '/Gazon artificiel vert luxuriant couvrant une surface lisse.jpg',
             usedIn: ['About'],
             description: 'Gazon artificiel vert luxuriant',
-            type: 'local',
+            type: 'local' as 'local' | 'external' | 'supabase',
           },
           {
             id: '4',
@@ -85,7 +85,7 @@ export function useSupabaseImages() {
             path: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e',
             usedIn: ['Services (Terrains de sports)', 'Sports (Gazon synthétique)'],
             description: 'Terrain de sport avec gazon synthétique',
-            type: 'external',
+            type: 'external' as 'local' | 'external' | 'supabase',
           },
           {
             id: '5',
@@ -93,7 +93,7 @@ export function useSupabaseImages() {
             path: 'https://images.unsplash.com/photo-1620366392312-a882ba99461c',
             usedIn: ['Hero (arrière-plan)'],
             description: 'Image d\'arrière-plan de la section Hero',
-            type: 'external',
+            type: 'external' as 'local' | 'external' | 'supabase',
           },
           {
             id: '6',
@@ -101,7 +101,7 @@ export function useSupabaseImages() {
             path: 'https://images.unsplash.com/photo-1468259275264-bbe089c59d1a',
             usedIn: ['Sports (Multisport)'],
             description: 'Terrain multisport',
-            type: 'external',
+            type: 'external' as 'local' | 'external' | 'supabase',
           },
           {
             id: '7',
@@ -109,7 +109,7 @@ export function useSupabaseImages() {
             path: 'https://images.unsplash.com/photo-1595231712325-c9626d50b606',
             usedIn: ['Sports (Piste d\'athlétisme)'],
             description: 'Piste d\'athlétisme',
-            type: 'external',
+            type: 'external' as 'local' | 'external' | 'supabase',
           },
           {
             id: '8',
@@ -117,7 +117,7 @@ export function useSupabaseImages() {
             path: 'https://images.unsplash.com/photo-1526232761682-d26e03ac148e',
             usedIn: ['Sports (ET layer)'],
             description: 'Sous-couche ET layer',
-            type: 'external',
+            type: 'external' as 'local' | 'external' | 'supabase',
           },
           {
             id: '9',
@@ -125,7 +125,7 @@ export function useSupabaseImages() {
             path: '/logo_abofield.jpeg',
             usedIn: ['Favicon', 'Métadonnées Open Graph'],
             description: 'Logo d\'Abofield',
-            type: 'local',
+            type: 'local' as 'local' | 'external' | 'supabase',
           }
         ];
 
