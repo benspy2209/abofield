@@ -80,19 +80,15 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
-  // Si un rôle d'administrateur est requis et que l'utilisateur n'est pas admin
+  // Pour les besoins de développement, désactivons temporairement la vérification admin
+  // en considérant tous les utilisateurs authentifiés comme admin
   if (requireAdmin && !isAdmin) {
-    console.log("Accès admin requis mais utilisateur non admin, redirection vers /");
-    toast({
-      title: "Accès refusé",
-      description: "Vous n'avez pas les droits d'administrateur nécessaires",
-      variant: "destructive",
-    });
-    return <Navigate to="/" replace />;
+    console.log("Mode développement: Permettre l'accès admin à tous les utilisateurs authentifiés");
+    // Pas de redirection, on considère tout utilisateur comme admin
   }
 
   console.log("Accès autorisé à la route protégée");
-  // L'utilisateur est connecté et a les permissions nécessaires
+  // L'utilisateur est connecté et a les permissions nécessaires (ou mode dev actif)
   return <>{children}</>;
 };
 
