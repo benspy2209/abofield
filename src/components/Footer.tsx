@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-scroll';
-import { Facebook, Instagram, Linkedin, Mail, ArrowUp, Globe } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, ArrowUp } from 'lucide-react';
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -171,39 +171,25 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6 text-white">Contact</h3>
             <ul className="space-y-3">
-              <li className="flex items-start">
-                <span className="text-white/80">Adresse:</span>
-                <span className="ml-2 text-white/80">Rue P. Van Obberghen 45, 1140 Evere, Belgique</span>
+              <li className="text-white/80">Rue P. Van Obberghen 45, 1140 Evere, Belgique</li>
+              <li className="text-white/80">
+                <p>Otman BENCHERIF</p>
+                <p>Managing Partner</p>
+                <p>ABOFIELD srl/ BV</p>
               </li>
-              <li className="flex items-start">
-                <span className="text-white/80">Contact:</span>
-                <div className="ml-2 text-white/80">
-                  <p>Otman BENCHERIF</p>
-                  <p>Managing Partner</p>
-                </div>
-              </li>
-              <li className="flex items-center">
-                <span className="text-white/80">Mobile:</span>
-                <a href="tel:+32485549571" className="ml-2 text-white/80 hover:text-white transition-colors">
+              <li className="text-white/80">
+                <a href="tel:+32485549571" className="hover:text-white transition-colors">
                   +32 (0)485 54.95.71
                 </a>
               </li>
-              <li className="flex items-center">
-                <span className="text-white/80">Téléphone:</span>
-                <a href="tel:+3224302579" className="ml-2 text-white/80 hover:text-white transition-colors">
+              <li className="text-white/80">
+                <a href="tel:+3224302579" className="hover:text-white transition-colors">
                   +32 (0)2 430.25.79
                 </a>
               </li>
-              <li className="flex items-center">
-                <span className="text-white/80">Email:</span>
-                <a href="mailto:info@abofield.be" className="ml-2 text-white/80 hover:text-white transition-colors">
+              <li className="text-white/80">
+                <a href="mailto:info@abofield.be" className="hover:text-white transition-colors">
                   info@abofield.be
-                </a>
-              </li>
-              <li className="flex items-center">
-                <span className="text-white/80">Web:</span>
-                <a href="https://www.abofield.be" target="_blank" rel="noopener noreferrer" className="ml-2 text-white/80 hover:text-white transition-colors">
-                  www.abofield.be
                 </a>
               </li>
             </ul>
