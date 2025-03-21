@@ -71,30 +71,40 @@ const Maintenance = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 fade-in-view">
-            <Service 
-              icon={<ClipboardCheck size={24} />}
-              title="Inspection régulière"
-              description="Vérification complète de vos revêtements pour détecter les signes d'usure prématurée."
-            />
+          <div className="grid grid-cols-1 gap-6 fade-in-view">
+            <div className="rounded-lg overflow-hidden shadow-md">
+              <img 
+                src="/entretien.jpg" 
+                alt="Entretien de revêtement" 
+                className="w-full h-auto object-cover"
+              />
+            </div>
             
-            <Service 
-              icon={<RotateCcw size={24} />}
-              title="Nettoyage professionnel"
-              description="Techniques de nettoyage spécifiques pour chaque type de revêtement afin de préserver ses propriétés."
-            />
-            
-            <Service 
-              icon={<ShieldCheck size={24} />}
-              title="Réparations"
-              description="Interventions rapides pour réparer les zones endommagées et éviter leur dégradation."
-            />
-            
-            <Service 
-              icon={<CalendarCheck size={24} />}
-              title="Maintenance préventive"
-              description="Actions planifiées pour prévenir les problèmes avant qu'ils ne surviennent."
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <Service 
+                icon={<ClipboardCheck size={24} />}
+                title="Inspection régulière"
+                description="Vérification complète de vos revêtements pour détecter les signes d'usure prématurée."
+              />
+              
+              <Service 
+                icon={<RotateCcw size={24} />}
+                title="Nettoyage professionnel"
+                description="Techniques de nettoyage spécifiques pour chaque type de revêtement afin de préserver ses propriétés."
+              />
+              
+              <Service 
+                icon={<ShieldCheck size={24} />}
+                title="Réparations"
+                description="Interventions rapides pour réparer les zones endommagées et éviter leur dégradation."
+              />
+              
+              <Service 
+                icon={<CalendarCheck size={24} />}
+                title="Maintenance préventive"
+                description="Actions planifiées pour prévenir les problèmes avant qu'ils ne surviennent."
+              />
+            </div>
           </div>
         </div>
       </div>
