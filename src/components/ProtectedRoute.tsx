@@ -69,14 +69,22 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
 
   // Si l'utilisateur n'est pas connecté, on le redirige vers la page de connexion
   if (!user) {
+    console.log("Utilisateur non connecté, redirection vers /auth");
     return <Navigate to={`/auth?redirect=${encodeURIComponent(location.pathname)}`} replace />;
   }
 
   // Si un rôle d'administrateur est requis et que l'utilisateur n'est pas admin
   if (requireAdmin && !isAdmin) {
+    console.log("Accès admin requis mais utilisateur non admin, redirection vers /");
+    toast({
+      title: "Accès refusé",
+      description: "Vous n'avez pas les droits d'administrateur nécessaires",
+      variant: "destructive",
+    });
     return <Navigate to="/" replace />;
   }
 
+  console.log("Accès autorisé à la route protégée");
   // L'utilisateur est connecté et a les permissions nécessaires
   return <>{children}</>;
 };

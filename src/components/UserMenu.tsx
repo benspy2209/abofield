@@ -21,12 +21,16 @@ const UserMenu = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log("Déconnexion initiée...");
       await signOut();
       toast({
         title: "Déconnexion réussie",
         description: "Vous avez été déconnecté avec succès",
       });
+      console.log("Redirection vers la page d'accueil...");
       navigate('/');
+      // Force un rechargement de la page pour s'assurer que tout est réinitialisé
+      window.location.reload();
     } catch (error) {
       console.error('Error signing out:', error);
       toast({
@@ -73,28 +77,28 @@ const UserMenu = () => {
         
         {isAdmin && (
           <Fragment>
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="w-full" asChild>
               <Link to="/admin-dashboard" className="flex items-center cursor-pointer w-full">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span>Tableau de bord</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="w-full" asChild>
               <Link to="/image-manager" className="flex items-center cursor-pointer w-full">
                 <Images className="mr-2 h-4 w-4" />
                 <span>Gestionnaire d'images</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="w-full" asChild>
               <Link to="/content-editor" className="flex items-center cursor-pointer w-full">
                 <FileText className="mr-2 h-4 w-4" />
                 <span>Éditeur de contenu</span>
               </Link>
             </DropdownMenuItem>
             
-            <DropdownMenuItem asChild>
+            <DropdownMenuItem className="w-full" asChild>
               <Link to="/site-settings" className="flex items-center cursor-pointer w-full">
                 <PencilRuler className="mr-2 h-4 w-4" />
                 <span>Paramètres du site</span>
@@ -105,7 +109,7 @@ const UserMenu = () => {
           </Fragment>
         )}
         
-        <DropdownMenuItem>
+        <DropdownMenuItem className="w-full">
           <button
             onClick={handleSignOut}
             className="flex w-full items-center cursor-pointer text-destructive"

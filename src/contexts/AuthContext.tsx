@@ -61,6 +61,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       if (initialSession?.user) {
         await fetchUserProfile(initialSession.user.id);
+      } else {
+        setProfile(null);
+        setIsAdmin(false);
       }
       
       setIsLoading(false);
@@ -91,11 +94,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     console.log('Profile data:', data);
     setProfile(data as ProfileType);
-    setIsAdmin(!!data?.is_admin);
-    console.log('Is admin set to:', !!data?.is_admin);
+    
+    // Assurez-vous que le statut d'admin est correctement défini
+    const adminStatus = !!data?.is_admin;
+    console.log('Setting isAdmin to:', adminStatus);
+    setIsAdmin(adminStatus);
   };
   
   const signIn = async (email: string, password: string) => {
+    console.log('Signing in with:', email);
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -118,18 +125,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   
   const signOut = async () => {
     console.log('Signing out...');
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('Error signing out:', error);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        throw error;
+      }
+      
+      // Force clear local state to ensure UI updates
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      setIsAdmin(false);
+      
+      console.log('Sign out successful, state cleared');
+      
+      // Force refresh du localStorage pour assurer que la session est bien nettoyée
+      localStorage.removeItem('sb-piufckgtnbcrwvlavqll-auth-token');
+      
+      // Petite pause pour laisser le temps à Supabase de finaliser la déconnexion
+      await new Promise(resolve => setTimeout(resolve, 100));
+    } catch (error) {
+      console.error('Error in signOut function:', error);
       throw error;
     }
-    console.log('Sign out successful');
-    
-    // Clear local state explicitly
-    setUser(null);
-    setSession(null);
-    setProfile(null);
-    setIsAdmin(false);
   };
   
   const value = {
