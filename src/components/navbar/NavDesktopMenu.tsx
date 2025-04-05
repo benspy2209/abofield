@@ -1,93 +1,112 @@
 
-import { Link } from 'react-scroll';
-import { ChevronDown } from 'lucide-react';
-import DownloadBrochureForm from '../DownloadBrochureForm';
+import { Link } from 'react-router-dom';
+import { Link as ScrollLink } from 'react-scroll';
+import { useLocation } from 'react-router-dom';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { cn } from '@/lib/utils';
 
 const NavDesktopMenu = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  const navLinks = [
+    {
+      title: "Services",
+      path: "/services",
+      sections: [
+        { name: "Aménagement", path: "/services" },
+        { name: "Travaux préparatoires", path: "/services" },
+        { name: "Systèmes drainants", path: "/services" }
+      ]
+    },
+    {
+      title: "Plaines de jeux",
+      path: "/playgrounds",
+      sections: [
+        { name: "Sols amortissants", path: "/playgrounds" },
+        { name: "Aires de fitness", path: "/playgrounds" },
+        { name: "Espaces récréatifs", path: "/playgrounds" }
+      ]
+    },
+    {
+      title: "Terrains de sports",
+      path: "/sports",
+      sections: [
+        { name: "Multisport", path: "/sports" },
+        { name: "Gazon synthétique", path: "/sports" },
+        { name: "Tennis", path: "/sports" },
+        { name: "Padel", path: "/sports" },
+        { name: "Piste d'athlétisme", path: "/sports" },
+        { name: "Padfield", path: "/sports" }
+      ]
+    },
+    {
+      title: "Entretien",
+      path: "/maintenance",
+      sections: []
+    },
+    {
+      title: "Contact",
+      path: "/contact",
+      sections: []
+    }
+  ];
+
   return (
-    <div className="flex items-center space-x-8">
-      <Link 
-        to="about" 
-        spy={true} 
-        smooth={true} 
-        offset={-70} 
-        duration={700}
-        className="text-abofield-dark-text hover:text-abofield-blue cursor-pointer transition-colors duration-300"
-      >
-        À propos
-      </Link>
-      
-      <div className="relative group">
-        <button 
-          className="flex items-center text-abofield-dark-text hover:text-abofield-blue transition-colors duration-300"
-        >
-          Services <ChevronDown className="ml-1 w-4 h-4" />
-        </button>
-        <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-          <div className="py-1 rounded-md bg-white">
-            <Link 
-              to="playgrounds" 
-              spy={true} 
-              smooth={true} 
-              offset={-70} 
-              duration={700}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-abofield-lightgreen/20 hover:text-abofield-blue cursor-pointer"
-            >
-              Pleines de jeux
-            </Link>
-            <Link 
-              to="sports" 
-              spy={true} 
-              smooth={true} 
-              offset={-70} 
-              duration={700}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-abofield-lightgreen/20 hover:text-abofield-blue cursor-pointer"
-            >
-              Terrains de sports
-            </Link>
-            <Link 
-              to="maintenance" 
-              spy={true} 
-              smooth={true} 
-              offset={-70} 
-              duration={700}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-abofield-lightgreen/20 hover:text-abofield-blue cursor-pointer"
-            >
-              Entretien
-            </Link>
-          </div>
-        </div>
-      </div>
-      
-      <Link 
-        to="references" 
-        spy={true} 
-        smooth={true} 
-        offset={-70} 
-        duration={700}
-        className="text-abofield-dark-text hover:text-abofield-blue cursor-pointer transition-colors duration-300"
-      >
-        Références
-      </Link>
-      
-      <Link 
-        to="contact" 
-        spy={true} 
-        smooth={true} 
-        offset={-70} 
-        duration={700}
-        className="text-abofield-dark-text hover:text-abofield-blue cursor-pointer transition-colors duration-300"
-      >
-        Contact
-      </Link>
-      
-      <DownloadBrochureForm 
-        buttonText="Brochure"
-        pdfUrl="/Brochure_Abofield_fr.pdf"
-        className="flex items-center space-x-2 btn-primary"
-        showIcon={true}
-      />
-    </div>
+    <NavigationMenu>
+      <NavigationMenuList>
+        {navLinks.map(link => {
+          // Si la page est différente de la page d'accueil ou si le lien n'a pas de sections, utiliser un lien simple
+          if (!isHomePage || link.sections.length === 0) {
+            return (
+              <NavigationMenuItem key={link.title}>
+                <Link 
+                  to={link.path}
+                  className={cn(
+                    "px-4 py-2 text-abofield-dark-text hover:text-abofield-blue transition-colors font-medium",
+                    location.pathname === link.path && "text-abofield-blue"
+                  )}
+                >
+                  {link.title}
+                </Link>
+              </NavigationMenuItem>
+            );
+          }
+
+          // Si on est sur la page d'accueil et que le lien a des sections, utiliser un menu déroulant
+          return (
+            <NavigationMenuItem key={link.title}>
+              <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-abofield-blue data-[state=open]:bg-transparent">
+                {link.title}
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                  {link.sections.map((section) => (
+                    <li key={section.name}>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          to={section.path}
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <div className="text-sm font-medium leading-none">{section.name}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          );
+        })}
+      </NavigationMenuList>
+    </NavigationMenu>
   );
 };
 

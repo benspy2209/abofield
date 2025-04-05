@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
-import { Link } from 'react-scroll';
-import { ChevronDown } from 'lucide-react';
-import DownloadBrochureForm from '../DownloadBrochureForm';
+import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { cn } from '@/lib/utils';
 
 interface NavMobileMenuProps {
   isOpen: boolean;
@@ -10,105 +10,96 @@ interface NavMobileMenuProps {
 }
 
 const NavMobileMenu = ({ isOpen, onClose }: NavMobileMenuProps) => {
-  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const location = useLocation();
   
-  const toggleServices = () => setIsServicesOpen(!isServicesOpen);
+  const navLinks = [
+    {
+      title: "Services",
+      path: "/services",
+      sections: [
+        { name: "Aménagement", path: "/services" },
+        { name: "Travaux préparatoires", path: "/services" },
+        { name: "Systèmes drainants", path: "/services" }
+      ]
+    },
+    {
+      title: "Plaines de jeux",
+      path: "/playgrounds",
+      sections: [
+        { name: "Sols amortissants", path: "/playgrounds" },
+        { name: "Aires de fitness", path: "/playgrounds" },
+        { name: "Espaces récréatifs", path: "/playgrounds" }
+      ]
+    },
+    {
+      title: "Terrains de sports",
+      path: "/sports",
+      sections: [
+        { name: "Multisport", path: "/sports" },
+        { name: "Gazon synthétique", path: "/sports" },
+        { name: "Tennis", path: "/sports" },
+        { name: "Padel", path: "/sports" },
+        { name: "Piste d'athlétisme", path: "/sports" },
+        { name: "Padfield", path: "/sports" }
+      ]
+    },
+    {
+      title: "Entretien",
+      path: "/maintenance",
+      sections: []
+    },
+    {
+      title: "Contact",
+      path: "/contact",
+      sections: []
+    }
+  ];
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-md overflow-hidden animate-slide-down">
-      <div className="container-custom py-4 space-y-4">
-        <Link 
-          to="about" 
-          spy={true} 
-          smooth={true} 
-          offset={-70} 
-          duration={700}
-          className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
-          onClick={onClose}
-        >
-          À propos
-        </Link>
-        
-        <div>
-          <button 
-            onClick={toggleServices}
-            className="flex items-center justify-between w-full py-2 text-abofield-dark-text hover:text-abofield-blue"
-          >
-            <span>Services</span>
-            <ChevronDown className={`w-4 h-4 transition-transform ${isServicesOpen ? 'rotate-180' : ''}`} />
-          </button>
-          
-          {isServicesOpen && (
-            <div className="pl-4 space-y-2 mt-2 border-l-2 border-abofield-lightgreen">
+    <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg z-50">
+      <div className="py-4">
+        {navLinks.map((link) => (
+          <div key={link.title} className="border-b border-gray-100">
+            {link.sections.length > 0 ? (
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value={link.title} className="border-none">
+                  <AccordionTrigger className="py-3 px-6 hover:no-underline">
+                    <span className="text-abofield-dark-text">{link.title}</span>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="flex flex-col space-y-2 pl-8 pb-2">
+                      {link.sections.map((section) => (
+                        <Link 
+                          key={section.name}
+                          to={section.path} 
+                          className="py-2 text-gray-600 hover:text-abofield-blue"
+                          onClick={onClose}
+                        >
+                          {section.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ) : (
               <Link 
-                to="playgrounds" 
-                spy={true} 
-                smooth={true} 
-                offset={-70} 
-                duration={700}
-                className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
+                to={link.path} 
+                className={cn(
+                  "block py-3 px-6 text-abofield-dark-text hover:bg-gray-50",
+                  location.pathname === link.path && "text-abofield-blue font-medium"
+                )}
                 onClick={onClose}
               >
-                Pleines de jeux
+                {link.title}
               </Link>
-              <Link 
-                to="sports" 
-                spy={true} 
-                smooth={true} 
-                offset={-70} 
-                duration={700}
-                className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
-                onClick={onClose}
-              >
-                Terrains de sports
-              </Link>
-              <Link 
-                to="maintenance" 
-                spy={true} 
-                smooth={true} 
-                offset={-70} 
-                duration={700}
-                className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
-                onClick={onClose}
-              >
-                Entretien
-              </Link>
-            </div>
-          )}
-        </div>
-        
-        <Link 
-          to="references" 
-          spy={true} 
-          smooth={true} 
-          offset={-70} 
-          duration={700}
-          className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
-          onClick={onClose}
-        >
-          Références
-        </Link>
-        
-        <Link 
-          to="contact" 
-          spy={true} 
-          smooth={true} 
-          offset={-70} 
-          duration={700}
-          className="block py-2 text-abofield-dark-text hover:text-abofield-blue cursor-pointer"
-          onClick={onClose}
-        >
-          Contact
-        </Link>
-        
-        <DownloadBrochureForm 
-          buttonText="Brochure"
-          pdfUrl="/Brochure_Abofield_fr.pdf"
-          className="flex items-center space-x-2 btn-primary w-full justify-center"
-          showIcon={true}
-        />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );

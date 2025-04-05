@@ -1,8 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
-import { Link } from 'react-scroll';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link } from 'react-router-dom';
 import DownloadBrochureForm from './DownloadBrochureForm';
+import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,25 +32,23 @@ const Hero = () => {
       <div className="container-custom relative z-10 flex flex-col items-center justify-center text-white text-center pt-20">
         <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 translate-y-10'}`}>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-white">
-            <span className="block">Revêtements de sol amortissant</span>
-            <span className="block mt-2">pour besoins sportifs et récréatifs</span>
+            <span className="block">Plaines de jeux</span>
+            <span className="block mt-2">et terrains de sports</span>
           </h1>
           
           <p className="text-xl max-w-3xl mx-auto mb-8 text-white/90">
-            ABOFIELD est spécialisé dans l'aménagement et la maintenance des revêtements de sol amortissant pour les aires de jeux, espaces sportifs et sols de sécurité.
+            ABOFIELD vous accompagne dans l'aménagement et l'installation de vos plaines de jeux et terrains de sports, avec des solutions drainantes performantes.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-            <Link
-              to="services"
-              spy={true}
-              smooth={true}
-              offset={-70}
-              duration={700}
-              className="btn-secondary hover:scale-105"
+            <Button 
+              asChild
+              className="bg-abofield-blue hover:bg-abofield-blue/90 text-white"
             >
-              Découvrir nos services
-            </Link>
+              <Link to="/services">
+                Découvrir nos services
+              </Link>
+            </Button>
             
             <DownloadBrochureForm 
               buttonText="Télécharger la brochure"
@@ -59,7 +59,7 @@ const Hero = () => {
           
           {/* Scroll down indicator - moved below the buttons with margin */}
           <div className={`mt-12 animate-bounce transition-all duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-            <Link
+            <ScrollLink
               to="services"
               spy={true}
               smooth={true}
@@ -69,7 +69,7 @@ const Hero = () => {
             >
               <span className="text-sm mb-2 font-light">Découvrir</span>
               <ArrowDown className="text-white" size={24} />
-            </Link>
+            </ScrollLink>
           </div>
         </div>
       </div>

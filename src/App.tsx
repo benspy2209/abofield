@@ -5,7 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
-import Index from "./pages/Index";
+import Home from "./pages/Home";
+import PlaygroundsPage from "./pages/PlaygroundsPage";
+import SportsPage from "./pages/SportsPage";
+import ServicesPage from "./pages/ServicesPage";
+import MaintenancePage from "./pages/MaintenancePage";
+import ContactPage from "./pages/ContactPage";
 import ImageManager from "./pages/ImageManager";
 import AdminDashboard from "./pages/AdminDashboard";
 import ContentEditor from "./pages/ContentEditor";
@@ -34,7 +39,12 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/playgrounds" element={<PlaygroundsPage />} />
+            <Route path="/sports" element={<SportsPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/maintenance" element={<MaintenancePage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/auth" element={<Auth />} />
             <Route
               path="/image-manager"
