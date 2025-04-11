@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { Link as ScrollLink } from 'react-scroll';
 import { Link } from 'react-router-dom';
-import DownloadBrochureForm from './DownloadBrochureForm';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
@@ -50,11 +49,14 @@ const Hero = () => {
               </Link>
             </Button>
             
-            <DownloadBrochureForm 
-              buttonText="Télécharger la brochure"
-              pdfUrl="/Brochure_Abofield_fr.pdf"
-              className="flex items-center justify-center space-x-2 bg-white text-abofield-blue px-6 py-3 rounded-md shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 font-medium"
-            />
+            <Button 
+              asChild
+              className="bg-white text-abofield-blue hover:bg-white/90"
+            >
+              <Link to="/contact">
+                Demander un devis
+              </Link>
+            </Button>
           </div>
           
           {/* Scroll down indicator - moved below the buttons with margin */}
